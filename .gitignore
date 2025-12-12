@@ -1,0 +1,30 @@
+.env
+.venv/
+
+*.xlsx
+*.csv
+
+poetry.lock
+
+# Plans
+planning/
+
+# LaTeX auxiliary files
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.synctex.gz
+
+# AI slop
+CLAUDE.md
+GEMINI.md
+AGENTS.md
+
+.DS_Store
+
+__pypackages__/
+__pycache__/

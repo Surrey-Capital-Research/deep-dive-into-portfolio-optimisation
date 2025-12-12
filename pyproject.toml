@@ -1,0 +1,22 @@
+[project]
+name = "deep-dive-into-portfolio-optimisation"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "rickdisi",email = "riccardo.disilvio@icloud.com"}
+]
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "pandas (>=2.3.3,<3.0.0)",
+    "numpy (>=2.3.5,<3.0.0)",
+    "scipy (>=1.16.3,<2.0.0)",
+    "statsmodels (>=0.14.6,<0.15.0)",
+    "pyportfolioopt (>=1.5.6,<2.0.0)",
+    "riskfolio-lib (>=7.1.0,<8.0.0)"
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
