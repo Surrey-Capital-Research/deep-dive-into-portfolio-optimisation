@@ -4,7 +4,6 @@ import pandas as pd
 from functools import reduce
 
 DATA_DIR = "data"
-RAW_DIR = os.path.join(DATA_DIR, "raw")
 
 SUBFOLDERS = {
     "equities": "equity",
@@ -36,7 +35,7 @@ def load_and_prepare_csv(path: str) -> pd.DataFrame:
 def main():
     all_price_dfs = []
     for sub in SUBFOLDERS.keys():
-        folder = os.path.join(RAW_DIR, sub)
+        folder = os.path.join(DATA_DIR, sub)
         pattern = os.path.join(folder, "*.csv")
         csv_files = glob.glob(pattern)
 
