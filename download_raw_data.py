@@ -3,7 +3,7 @@ import yfinance as yf
 import pandas as pd
 
 START_DATE = "2015-01-01"
-END_DATE = "2025-01-01"
+END_DATE = "2026-01-01"
 INTERVAL = "1d"
 
 BASE_DATA_DIR = "data"
@@ -21,7 +21,7 @@ ASSET_GROUPS = {
         "SGLD.L",      
     ],
     "commodities": [
-        "WCOG.L",      
+        "AIGC.L",      
     ],
 }
 
