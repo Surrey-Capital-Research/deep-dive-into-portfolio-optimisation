@@ -14,4 +14,4 @@ weights = equal_weights(return_matrix.columns)
 
 print(weights)
 print("Sum of weights:", weights.sum())
-
+weights.to_csv("bm_implementation/weights.csv", header=["weights"])

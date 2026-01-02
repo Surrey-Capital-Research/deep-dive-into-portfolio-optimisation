@@ -43,3 +43,4 @@ price_df = price_df.iloc[:-1]
 price_df.to_csv(output_path)
 
 print("Price matrix saved to:", output_path)
+
