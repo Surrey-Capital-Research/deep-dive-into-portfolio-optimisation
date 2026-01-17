@@ -3,23 +3,40 @@
 \usetheme{Madrid}
 \usecolortheme{default}
 
-% APCR Colors
-\definecolor{apcrdarkblue}{RGB}{30,90,160}
-\definecolor{apcrblue}{RGB}{60,140,230}
-\definecolor{apcrlightblue}{RGB}{235,245,255}
+% SCR Colors
+\definecolor{scrdarkblue}{RGB}{30,90,160}
+\definecolor{scrblue}{RGB}{60,140,230}
+\definecolor{scrlightblue}{RGB}{235,245,255}
 \definecolor{accentorange}{RGB}{255,140,50}
 
 % Apply colors to theme
-\setbeamercolor{palette primary}{bg=apcrdarkblue,fg=white}
-\setbeamercolor{palette secondary}{bg=apcrblue,fg=white}
-\setbeamercolor{palette tertiary}{bg=apcrdarkblue,fg=white}
-\setbeamercolor{palette quaternary}{bg=apcrblue,fg=white}
-\setbeamercolor{structure}{fg=apcrdarkblue}
-\setbeamercolor{section in toc}{fg=apcrdarkblue}
-\setbeamercolor{subsection in head/foot}{bg=apcrlightblue,fg=apcrdarkblue}
+\setbeamercolor{palette primary}{bg=scrdarkblue,fg=white}
+\setbeamercolor{palette secondary}{bg=scrblue,fg=white}
+\setbeamercolor{palette tertiary}{bg=scrdarkblue,fg=white}
+\setbeamercolor{palette quaternary}{bg=scrblue,fg=white}
+\setbeamercolor{structure}{fg=scrdarkblue}
+\setbeamercolor{section in toc}{fg=scrdarkblue}
+\setbeamercolor{subsection in head/foot}{bg=scrlightblue,fg=scrdarkblue}
 
 % Remove navigation symbols
 \setbeamertemplate{navigation symbols}{}
+
+% Customize footer
+\setbeamertemplate{footline}{
+  \leavevmode%
+  \hbox{%
+    \begin{beamercolorbox}[wd=.333333\paperwidth,ht=2.25ex,dp=1ex,center]{author in head/foot}%
+      \usebeamerfont{author in head/foot}\insertshortauthor
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.333333\paperwidth,ht=2.25ex,dp=1ex,center]{title in head/foot}%
+      \usebeamerfont{title in head/foot}\insertshorttitle
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.333333\paperwidth,ht=2.25ex,dp=1ex,right]{date in head/foot}%
+      \usebeamerfont{date in head/foot}\insertshortdate{}\hspace*{2em}
+      \insertframenumber{} / \inserttotalframenumber\hspace*{2ex} 
+    \end{beamercolorbox}}%
+  \vskip0pt%
+}
 
 % Packages
 \usepackage{graphicx}
@@ -28,10 +45,18 @@
 \usepackage{tikz}
 \usepackage{hyperref}
 
+% Background stag watermark (half off page on right side)
+\usebackgroundtemplate{%
+  \tikz[overlay,remember picture]
+  \node[opacity=0.2, at=(current page.east), anchor=west, xshift=-6cm, yshift=0cm] {
+    \includegraphics[height=10cm]{../images/surrey-stag.png}
+  };
+}
+
 % Code listing style
 \lstset{
     basicstyle=\ttfamily\footnotesize,
-    keywordstyle=\color{apcrblue}\bfseries,
+    keywordstyle=\color{scrblue}\bfseries,
     commentstyle=\color{gray}\itshape,
     stringstyle=\color{accentorange},
     numbers=left,
@@ -48,9 +73,9 @@
 }
 
 % Title page info
-\title{A Deep Dive into Portfolio Optimisation}
-\subtitle{Under the Hood}
-\author{SCR Quantitative Research Team}
+\title{Under the Hood:}
+\subtitle{A Deep Dive into Portfolio Optimisation}
+\author{SCR Quantitative Research Division}
 \institute{Surrey Capital Research, University of Surrey}
 \date{January 2025}
 
@@ -70,7 +95,7 @@ stocks, bonds, gold, and commodities...
 
 \vspace{1em}
 
-\textcolor{apcrblue}{\textbf{How would you split it?}}
+\textcolor{scrblue}{\textbf{How would you split it?}}
 
 \vspace{1em}
 
@@ -147,7 +172,7 @@ Commodities & WisdomTree Commodities ETF & 1 \\
 
 \vspace{1em}
 \begin{center}
-\textcolor{apcrblue}{\textbf{All tested on identical data with identical methodology}}
+\textcolor{scrblue}{\textbf{All tested on identical data with identical methodology}}
 \end{center}
 \end{frame}
 
@@ -240,10 +265,10 @@ w_i \times \frac{\partial \sigma_p}{\partial w_i} = \frac{\sigma_p}{N}
 \begin{frame}{How We're Testing: Backtesting Engine}
 \begin{center}
 \begin{tikzpicture}[node distance=1.5cm, scale=0.9, every node/.style={scale=0.9}]
-    \tikzstyle{block} = [rectangle, draw, fill=apcrlightblue,
+    \tikzstyle{block} = [rectangle, draw, fill=scrlightblue,
         text width=3.5cm, text centered, rounded corners=4pt, minimum height=1cm,
-        line width=1pt, draw=apcrblue]
-    \tikzstyle{arrow} = [thick,->,>=stealth,color=apcrblue]
+        line width=1pt, draw=scrblue]
+    \tikzstyle{arrow} = [thick,->,>=stealth,color=scrblue]
 
     \node [block] (data) {Past Price Data\\(up to rebalance date)};
     \node [block, below of=data] (strategy) {Strategy Computes\\Target Weights};
@@ -379,7 +404,7 @@ class EqualWeightStrategy(BaseStrategy):
 
 \vspace{0.3em}
 \begin{center}
-\textcolor{apcrblue}{\textbf{Simple, but surprisingly hard to beat!}}
+\textcolor{scrblue}{\textbf{Simple, but surprisingly hard to beat!}}
 \end{center}
 \end{frame}
 
@@ -422,7 +447,7 @@ class EqualWeightStrategy(BaseStrategy):
 \begin{frame}{What This Means}
 \begin{center}
 \Large
-\textcolor{apcrdarkblue}{\textbf{Bridging the gap between theory and practice}}
+\textcolor{scrdarkblue}{\textbf{Bridging the gap between theory and practice}}
 \end{center}
 
 \vspace{1em}
@@ -471,7 +496,7 @@ Contact us at [email/contact]
 \begin{frame}
 \begin{center}
 \Huge
-\textcolor{apcrdarkblue}{\textbf{Thank You}}
+\textcolor{scrdarkblue}{\textbf{Thank You}}
 
 \vspace{2em}
 
