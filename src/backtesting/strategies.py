@@ -146,8 +146,9 @@ class BlackLittermanStrategy(BaseStrategy):
         )
 
         # Past data up to decision_date
-        P, Q = self.view_builder(window_prices, decision_date)
-
+        # We add Omega here so it can catch all three values from your FFT builder
+        P, Q, Omega = self.view_builder(window_prices, decision_date)
+        
         if P.size == 0:
             # No views: just use prior + MVO
             # replace return with weights.reindex(self.tickers).fillna(0.0) when MVO done
