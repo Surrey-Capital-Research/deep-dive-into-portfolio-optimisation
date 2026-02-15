@@ -17,6 +17,7 @@ from src.models.predictor import ProductionStockRegressor
 DATA_PATH = "data/uk_multi_asset_prices_clean.csv"
 RESULTS_DIR = "results"
 INITIAL_CAPITAL = 100_000.0
+DATA_CUTOFF_DATE = "2025-12-31"
 
 def load_data():
     # Sanity check to make sure we actually have the file
@@ -24,7 +25,8 @@ def load_data():
         raise FileNotFoundError(f"Missing data file: {DATA_PATH}")
     
     prices = pd.read_csv(DATA_PATH, index_col=0, parse_dates=True)
-    
+    prices = prices.loc[:DATA_CUTOFF_DATE] # Just in case there are some future dates in there, 
+    # we don't want them to mess with the backtest
     # Forward fill to handle random missing days
     # prevents the backtester from crashing on NaNs
     prices = prices.ffill() 
