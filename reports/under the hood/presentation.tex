@@ -18,25 +18,38 @@
 \setbeamercolor{section in toc}{fg=scrdarkblue}
 \setbeamercolor{subsection in head/foot}{bg=scrlightblue,fg=scrdarkblue}
 
+% Softer alert blocks (avoid heavy red banners)
+\setbeamercolor{alertblock title}{bg=scrblue,fg=white}
+\setbeamercolor{alertblock body}{bg=scrlightblue,fg=black}
+
 % Remove navigation symbols
 \setbeamertemplate{navigation symbols}{}
 
-% Customize footer
+
+% Footer (lighter + less dominant)
+\setbeamercolor{author in head/foot}{bg=scrlightblue,fg=scrdarkblue}
+\setbeamercolor{title in head/foot}{bg=scrlightblue,fg=scrdarkblue}
+\setbeamercolor{date in head/foot}{bg=scrlightblue,fg=scrdarkblue}
+\setbeamerfont{author in head/foot}{size=\scriptsize}
+\setbeamerfont{title in head/foot}{size=\scriptsize}
+\setbeamerfont{date in head/foot}{size=\scriptsize}
+
 \setbeamertemplate{footline}{
   \leavevmode%
   \hbox{%
-    \begin{beamercolorbox}[wd=.333333\paperwidth,ht=2.25ex,dp=1ex,center]{author in head/foot}%
-      \usebeamerfont{author in head/foot}\insertshortauthor
+    \begin{beamercolorbox}[wd=.34\paperwidth,ht=2.0ex,dp=0.9ex,left]{author in head/foot}%
+      \hspace*{1.2ex}\insertshortauthor
     \end{beamercolorbox}%
-    \begin{beamercolorbox}[wd=.333333\paperwidth,ht=2.25ex,dp=1ex,center]{title in head/foot}%
-      \usebeamerfont{title in head/foot}\insertshorttitle
+    \begin{beamercolorbox}[wd=.44\paperwidth,ht=2.0ex,dp=0.9ex,center]{title in head/foot}%
+      \insertshorttitle
     \end{beamercolorbox}%
-    \begin{beamercolorbox}[wd=.333333\paperwidth,ht=2.25ex,dp=1ex,right]{date in head/foot}%
-      \usebeamerfont{date in head/foot}\insertshortdate{}\hspace*{2em}
-      \insertframenumber{} / \inserttotalframenumber\hspace*{2ex} 
-    \end{beamercolorbox}}%
+    \begin{beamercolorbox}[wd=.22\paperwidth,ht=2.0ex,dp=0.9ex,right]{date in head/foot}%
+      \insertshortdate{}\hspace*{1.2ex}\insertframenumber{} / \inserttotalframenumber\hspace*{1.2ex}
+    \end{beamercolorbox}%
+  }%
   \vskip0pt%
 }
+
 
 % Packages
 \usepackage{graphicx}
@@ -44,90 +57,78 @@
 \usepackage{listings}
 \usepackage{tikz}
 \usepackage{hyperref}
+\usepackage{tikz}
+\usetikzlibrary{positioning}
 
-% Background stag watermark (half off page on right side)
-\usebackgroundtemplate{%
-  \tikz[overlay,remember picture]
-  \node[opacity=0.2, at=(current page.east), anchor=west, xshift=-6cm, yshift=0cm] {
-    \includegraphics[height=10cm]{../images/surrey-stag.png}
-  };
+
+
+% Background watermark (used only on selected slides)
+\newcommand{\watermark}{
+    \usebackgroundtemplate{
+        \tikz[remember picture,overlay] 
+        \node[opacity=0.4] at (current page.east)
+        {\includegraphics[width=0.8\paperwidth]{../images/surrey-stag.png}
+        };
+    }
 }
 
-% Code listing style
-\lstset{
-    basicstyle=\ttfamily\footnotesize,
-    keywordstyle=\color{scrblue}\bfseries,
-    commentstyle=\color{gray}\itshape,
-    stringstyle=\color{accentorange},
-    numbers=left,
-    numberstyle=\tiny\color{gray},
-    backgroundcolor=\color{white},
-    showspaces=false,
-    showstringspaces=false,
-    showtabs=false,
-    frame=single,
-    rulecolor=\color{gray!30},
-    tabsize=4,
-    breaklines=true,
-    language=Python
-}
+
 
 % Title page info
 \title{Under the Hood:}
 \subtitle{A Deep Dive into Portfolio Optimisation}
 \author{SCR Quantitative Research Division}
 \institute{Surrey Capital Research, University of Surrey}
-\date{January 2025}
-
+\date{February 2026}
 \begin{document}
 
 % Title slide
+{
+\watermark
 \begin{frame}
 \titlepage
-\end{frame}
 
-% The Big Question
-\begin{frame}{The Big Question}
+\end{frame}
+}
+% The Research Objective
+\begin{frame}{The Research Objective}
 \begin{center}
 \Large
-If you had \textbf{£100,000} to invest across\\
-stocks, bonds, gold, and commodities...
+\begin{block}{Primary Question}
+Do sophisticated portfolio optimisation models outperform basic models in out-of-sample testing?
+\end{block}
 
-\vspace{1em}
-
-\textcolor{scrblue}{\textbf{How would you split it?}}
-
-\vspace{1em}
+\vspace{1cm}
 
 \normalsize
-\begin{itemize}
-    \item Split equally (1/18 per asset)?
-    \item Use complex mathematical optimization?
-    \item Something else?
-\end{itemize}
+\textcolor{scrblue}{\textbf{If you have £100,000 to invest across stocks, bonds, precious metals and commodities. \\ How should it be allocated?}}
 
-\vspace{0.5em}
+\vspace{1cm}
 \textbf{We're testing this empirically.}
 \end{center}
 \end{frame}
 
-% Research Question
-\begin{frame}{The Research Question}
-\begin{block}{Core Question}
-Can sophisticated portfolio optimisation models beat the naive 1/N strategy?
-\end{block}
+% Motivation
+\begin{frame}{Motivation}
 
-\vspace{1em}
+\Large
+Portfolio optimisation is central to modern finance, investors rely on mathematical models to allocate capital.
 
-\textbf{Why this matters:}
+\vspace{0.4cm}
+
+\normalsize
+However:
+
 \begin{itemize}
-    \item \textbf{For investors:} Should you pay for complex portfolio management?
-    \item \textbf{For students:} Does classroom theory work in practice?
-    \item \textbf{For quant enthusiasts:} Rigorous empirical comparison
+\item Empirical evidence suggests naive strategies often perform competitively.
+\item Market conditions shift across regimes.
+\item Increased model complexity may not always translate into better outcomes.
 \end{itemize}
 
-\vspace{0.5em}
+\vspace{0.4cm}
+
 \small
+\centering
 \textit{This is a live debate in quantitative finance — theory vs. practice.}
 \end{frame}
 
@@ -139,7 +140,7 @@ Can sophisticated portfolio optimisation models beat the naive 1/N strategy?
 \toprule
 \textbf{Asset Class} & \textbf{Examples} & \textbf{Count} \\
 \midrule
-UK Equities & HSBC, BP, Shell, Tesco, AstraZeneca, etc... & 15 \\
+UK Equities & HSBC, BP, Shell, Tesco, etc... & 15 \\
 UK Government Bonds & iShares Core UK Gilts ETF & 1 \\
 Precious Metals & Invesco Physical Gold ETC & 1 \\
 Commodities & WisdomTree Commodities ETF & 1 \\
@@ -149,12 +150,13 @@ Commodities & WisdomTree Commodities ETF & 1 \\
 \end{tabular}
 \end{table}
 
-\vspace{0.5em}
+\vspace{0.5cm}
 
 \textbf{Data period:} 2015–2025 (10 years)
 \begin{itemize}
-    \item Includes COVID crash, 2022 selloff, Brexit volatility
-    \item Daily prices, monthly rebalancing
+    \item Including major stress regimes
+    \item Daily prices
+    \item Monthly rebalancing
 \end{itemize}
 \end{frame}
 
@@ -177,23 +179,23 @@ Commodities & WisdomTree Commodities ETF & 1 \\
 \end{frame}
 
 % Model 1: Equal Weight
-\begin{frame}{Strategy 1: Equal Weight (1/N)}
+\begin{frame}{Strategy 1: Equal Weight }
 \begin{block}{The Benchmark}
 Simplest possible: split money equally across all 18 assets
 \end{block}
 
-\textbf{How it works:}
-\begin{itemize}
-    \item £5,556 to each asset (on £100k capital)
-    \item Monthly rebalancing to maintain 1/18 weights
-    \item No forecasting, no optimization
-\end{itemize}
 
-\vspace{0.5em}
+\begin{center}
+\Large
+\[ w_i = \frac{1}N{}\]
+\end{center}
+\vspace{1cm}
 
-\begin{alertblock}{Why it's tough to beat}
-DeMiguel et al. (2009): Equal weight often beats sophisticated models due to estimation error in expected returns and covariances.
-\end{alertblock}
+\normalsize
+
+DeMiguel et al (2009): Equal weight often beats sophisticated models due to estimation error in expected returns and covariances.
+
+
 \end{frame}
 
 % Model 2: MVO
@@ -204,65 +206,64 @@ Maximize return for given risk (or minimize risk for given return)
 
 \vspace{0.5em}
 
-\textbf{Optimization:}
+\Large
 \[
 \max_{w} \frac{w^T \mu - r_f}{\sqrt{w^T \Sigma w}} \quad \text{s.t.} \quad \sum w_i = 1, \, w_i \geq 0
 \]
 
-\vspace{0.5em}
+\vspace{1cm}
+\normalsize
+Highly sensitive to $\mu$ and $\Sigma$ estimation and can produce extreme, unstable allocations out-of-sample.
 
-\textbf{The challenge:}
-\begin{itemize}
-    \item Very sensitive to estimation errors in $\mu$ and $\Sigma$
-    \item Small input changes → big portfolio changes
-    \item Can produce extreme, unstable weights
-\end{itemize}
 \end{frame}
 
 % Model 3: Black-Litterman
-\begin{frame}{Strategy 3: Black-Litterman}
-\begin{block}{Combining Market Equilibrium with Investor Views}
-Overcomes MVO instability by anchoring to market equilibrium
+\begin{frame}{Strategy 3: Black-Litterman Model}
+\begin{block}{ Fischer Black and Robert Litterman (1992) - Global Portfolio Optimisation }
+    Model was created as an enhancement to MVO which overcomes instability by anchoring to market equilibrium.
 \end{block}
+\vspace{0.5cm}
 
-\textbf{How it works:}
-\begin{enumerate}
-    \item Start with equilibrium returns (from market cap weights)
-    \item Express views: "UK banks will outperform by 2\%"
-    \item Blend equilibrium + views using Bayesian updating
-    \item Optimize portfolio with posterior returns
-\end{enumerate}
+\begin{center}
+\Large
+Posterior Returns = Equilibrium + Investor Views
+\end{center}
 
-\vspace{0.5em}
+\vspace{0.5cm}
 
-\textbf{Key advantage:} More stable than pure MVO — doesn't require perfect forecasts
+\normalsize
+\begin{itemize}
+    \item Posterior Returns $\rightarrow$ A complex, weighted average which generates an estimate of expected returns.
+    \item Equilibrium $\rightarrow$ A neutral, market capitalisation-weighted returns
+    \item Investor Views $\rightarrow$ A non-neutral view on asset returns which is weighted by confidence.
+\end{itemize}
+
+\vspace{0.5cm}
+
+
 \end{frame}
 
 % Model 4: Risk Parity
 \begin{frame}{Strategy 4: Risk Parity}
 \begin{block}{Equal Risk Contribution, Not Equal Capital}
-Philosophy: diversify risk, not just money
+The philosophy of this model is to diversify risk with a structural bias to low-volatility assets.
 \end{block}
 
-\vspace{0.5em}
+\vspace{0.5cm}
 
-Each asset contributes equally to total portfolio risk:
+\Large
 \[
 w_i \times \frac{\partial \sigma_p}{\partial w_i} = \frac{\sigma_p}{N}
 \]
 
-\vspace{0.5em}
+\vspace{0.5cm}
+\normalsize
+Allocates capital to equalise marginal risk contribution ensuring no single asset or sector is dominant in the portfolio.
 
-\textbf{In practice:}
-\begin{itemize}
-    \item Bonds (low vol) get \textit{more} capital
-    \item Equities (high vol) get \textit{less} capital
-    \item Popular with institutional investors (e.g., Bridgewater All Weather)
-\end{itemize}
 \end{frame}
 
 % Backtesting Methodology
-\begin{frame}{How We're Testing: Backtesting Engine}
+\begin{frame}{Backtesting Engine}
 \begin{center}
 \begin{tikzpicture}[node distance=1.5cm, scale=0.9, every node/.style={scale=0.9}]
     \tikzstyle{block} = [rectangle, draw, fill=scrlightblue,
@@ -284,132 +285,68 @@ w_i \times \frac{\partial \sigma_p}{\partial w_i} = \frac{\sigma_p}{N}
 
 \vspace{0.3em}
 
-\begin{alertblock}{Critical: No Look-Ahead Bias}
-Strategies only see \textbf{past data}. This prevents unrealistically good backtest results.
+\begin{alertblock}{Critical:}
+Strictly rolling out-of-sample backtesting with no forward-looking information.
 \end{alertblock}
-\end{frame}
-
-% Code: Look-Ahead Bias Prevention
-\begin{frame}[fragile]{Code: Preventing Look-Ahead Bias}
-\begin{lstlisting}
-for current_date in dates:
-    if current_date in rebalance_dates:
-        # CRITICAL: Only past data
-        past_prices = self.prices.loc[:current_date]
-
-        # Strategy uses ONLY past data
-        target_weights = self.strategy.get_target_weights(
-            decision_date=current_date,
-            past_prices=past_prices  # No future!
-        )
-
-        # Execute rebalancing
-        # ...
-
-    # Track portfolio value
-    equity_curve[current_date] = portfolio_value
-\end{lstlisting}
 \end{frame}
 
 % Performance Metrics
 \begin{frame}{What We're Measuring}
 \begin{table}
+
+\renewcommand{\arraystretch}{1.5}
+
 \small
-\begin{tabular}{l p{7cm}}
+\begin{tabular}{l | l | r}
 \toprule
-\textbf{Metric} & \textbf{What It Measures} \\
+\textbf{Metric} & \textbf{Definition} & \textbf{Focus} \\
 \midrule
-Total Return & Cumulative gain/loss over 10 years \\
-CAGR & Annualised return \\
-Volatility & Annualised standard deviation \\
-Sharpe Ratio & Excess return per unit of risk \\
-Max Drawdown & Worst peak-to-trough loss \\
-Sortino Ratio & Return per unit of downside risk \\
-Turnover & Trading frequency (costs) \\
+Total Return & Cumulative gain/loss (10 years) & Returns \\
+CAGR & Annualised return & Returns \\
+Volatility & Annualised standard deviation & Risk \\
+Sharpe Ratio & Excess return per unit of risk & Risk Adjusted Performance \\
+Max Drawdown & Largest peak-to-trough decline & Tail Risk\\
+Sortino Ratio & Downside risk-adjusted return & Downside Risk\\
+Turnover & Trading frequency (costs) & Implementation Risk \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\vspace{0.5em}
-\textbf{Goal:} Understand risk-adjusted performance, not just returns
 \end{frame}
 
-% What Insights We Expect
-\begin{frame}{What Insights We're Looking For}
-\textbf{1. Risk-Adjusted Performance}
+% Evaluation Criteria
+\begin{frame}{Evaluation Framework}
+
+\textbf{Performance}
 \begin{itemize}
-    \item Which model has the best Sharpe ratio?
-    \item Is complexity worth the cost?
+    \item Sharpe ratio, Sortino ratio, Maximum drawdown
 \end{itemize}
 
-\vspace{0.5em}
+\vspace{0.3cm}
 
-\textbf{2. Crisis Performance}
+\textbf{Regime Robustness}
 \begin{itemize}
-    \item COVID crash (March 2020)
-    \item 2022 equity-bond selloff
-    \item Brexit volatility (2016)
+    \item Brexit (2016), COVID crash, 2022 equity-bond sell-off
 \end{itemize}
 
-\vspace{0.5em}
+\vspace{0.3cm}
 
-\textbf{3. Practical Considerations}
+\textbf{Implementation Feasibility}
 \begin{itemize}
-    \item Turnover costs
-    \item Implementation difficulty
-    \item Robustness to parameter choices
+    \item Turnover, allocation stability, parameter sensitivity
 \end{itemize}
+
+\vspace{0.5cm}
+
+\centering
+\textit{Strategies are evaluated on performance, resilience, and implementability.}
+
 \end{frame}
 
-% Strategy Architecture
-\begin{frame}[fragile]{The Strategy Architecture}
-\small
-\begin{block}{BaseStrategy Interface}
-All models implement this clean abstraction:
-\end{block}
 
-\begin{lstlisting}
-class BaseStrategy(ABC):
-    @abstractmethod
-    def get_target_weights(
-        self,
-        decision_date: pd.Timestamp,
-        past_prices: pd.DataFrame,  # ONLY past
-        current_positions: pd.Series,
-        cash: float,
-    ) -> pd.Series:
-        """Return target weights (sum = 1.0)"""
-        raise NotImplementedError
-\end{lstlisting}
-
-\textbf{Why?} Fair comparison, extensibility, enforces no look-ahead bias
-\end{frame}
-
-% Example: Equal Weight Implementation
-\begin{frame}[fragile]{Example: Equal Weight Strategy}
-\begin{lstlisting}
-class EqualWeightStrategy(BaseStrategy):
-    def __init__(self, tickers: list[str]):
-        self.tickers = tickers
-
-    def get_target_weights(self, decision_date,
-                          past_prices,
-                          current_positions, cash):
-        # Just return 1/N for all assets
-        n = len(self.tickers)
-        weights = pd.Series(1.0 / n,
-                           index=self.tickers)
-        return weights
-\end{lstlisting}
-
-\vspace{0.3em}
-\begin{center}
-\textcolor{scrblue}{\textbf{Simple, but surprisingly hard to beat!}}
-\end{center}
-\end{frame}
 
 % Progress Update
-\begin{frame}{Where We Are Now}
+\begin{frame}{Implementation Status}
 \begin{columns}
 \begin{column}{0.48\textwidth}
 \textbf{Completed:}
@@ -444,28 +381,25 @@ class EqualWeightStrategy(BaseStrategy):
 \end{frame}
 
 % What This Research Means
-\begin{frame}{What This Means}
+\begin{frame}{Implications}
 \begin{center}
 \Large
 \textcolor{scrdarkblue}{\textbf{Bridging the gap between theory and practice}}
 \end{center}
 
-\vspace{1em}
+\Large
+\vspace{0.5cm}
+\centering
+Empirical test of whether a theoretical perfect portfolio survives real-world estimation errors and regime shifts 
 
-\begin{itemize}
-    \item \textbf{For investors:} Does sophisticated management add value?
-    \vspace{0.5em}
-    \item \textbf{For students:} Testing what you learn in lectures
-    \vspace{0.5em}
-    \item \textbf{For quants:} Rigorous comparison with clean methodology
-\end{itemize}
+\vspace{1cm}
 
-\vspace{1em}
-
+\normalsize
 \begin{center}
 \textit{Academic finance says "here's the optimal solution"\\
 We're asking: "does it actually work?"}
 \end{center}
+
 \end{frame}
 
 % Follow Along
@@ -475,7 +409,7 @@ We're asking: "does it actually work?"}
 \textbf{GitHub Repository}\\
 \vspace{0.5em}
 \normalsize
-\url{github.com/AP-Capital-Research/deep-dive-into-portfolio-optimisation}
+\hyperlink{GitHub Link}{github.com/AP-Capital-Research/deep-dive-into-portfolio-optimisation}
 
 \vspace{2em}
 
@@ -483,16 +417,19 @@ We're asking: "does it actually work?"}
 \textbf{Full Research Report}\\
 \vspace{0.5em}
 \normalsize
-Expected publication: [Month] 2025
+Expected publication: March 2026
 
 \vspace{2em}
 
 \textbf{Questions or feedback?}\\
 Contact us at [email/contact]
 \end{center}
+
 \end{frame}
 
 % Thank You
+{
+\watermark
 \begin{frame}
 \begin{center}
 \Huge
@@ -509,6 +446,8 @@ with the quant finance community
 \normalsize
 \textit{Stay tuned for the full results}
 \end{center}
+
 \end{frame}
+}
 
 \end{document}
