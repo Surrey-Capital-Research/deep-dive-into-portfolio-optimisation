@@ -15,7 +15,8 @@ ASSET_GROUPS = {
         "RIO.L", "GLEN.L", "NG.L", "VOD.L", "RR.L",
     ],
     "bonds": [
-        "IGLT.L",      
+        "IGLT.L",
+        "^v30082.L",      
     ],
     "precious_metals_etc": [
         "SGLD.L",      
