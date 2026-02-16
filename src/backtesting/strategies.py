@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 from typing import Callable
 
+from src.models.risk_parity import compute_risk_parity_weights
 from src.models.black_litterman import (
     implied_equilibrium_returns,
     black_litterman_posterior,
@@ -171,3 +172,32 @@ class BlackLittermanStrategy(BaseStrategy):
             weights = weights / weights.sum()
 
         return weights
+
+class RiskParityStrategy(BaseStrategy):
+    def __init__(self, tickers: list[str], cov_window: int = 252):
+        self.tickers = list(tickers)
+        self.cov_window = cov_window
+
+    def get_target_weights(
+            self,
+            decision_date: pd.Timestamp,
+            past_prices: pd.DataFrame,
+            current_positions: pd.Series,
+            cash: float
+        ) -> pd.Series:
+        
+        prices = past_prices[self.tickers].dropna(how="all")
+
+        if past_prices.shape[0] < self.cov_window:
+            # fall back to market weights
+            return pd.Series(1.0 / len(self.tickers), index=self.tickers)
+        
+        recent_prices = prices.iloc[-self.cov_window:]
+        returns = recent_prices.pct_change().dropna()
+
+        cov = returns.cov().values
+
+        weights = compute_risk_parity_weights(cov)
+
+        return pd.Series(weights, index=self.tickers)
+

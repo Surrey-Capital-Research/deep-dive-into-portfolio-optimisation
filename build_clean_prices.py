@@ -64,7 +64,7 @@ def main():
     print("DEBUG merged index min/max:", merged.index.min(), merged.index.max())
     print("DEBUG merged shape before date filter:", merged.shape)
     start = pd.Timestamp("2015-01-01")
-    end = pd.Timestamp("2025-01-01")
+    end = pd.Timestamp("2026-01-01")
     merged = merged[(merged.index >= start) & (merged.index <= end)]
     print("DEBUG merged shape after date filter:", merged.shape)
     merged = merged.dropna(how="all")
