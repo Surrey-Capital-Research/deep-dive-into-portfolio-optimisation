@@ -21,6 +21,10 @@ def load_and_prepare_csv(path: str) -> pd.DataFrame:
     df.iloc[:, 0] = pd.to_datetime(df.iloc[:, 0])
     df = df.rename(columns={df.columns[0]: "Date"})
     ticker = os.path.splitext(os.path.basename(path))[0]
+
+    if ticker == "^v30082.L":
+        ticker = "UK_10Y-Yield"
+
     close_series = df["Close"]
 
     df_out = pd.DataFrame(

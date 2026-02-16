@@ -9,7 +9,7 @@ from dataclasses import asdict
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from src.backtesting.backtester import Backtester
-from src.backtesting.strategies import EqualWeightStrategy, BlackLittermanStrategy
+from src.backtesting.strategies import EqualWeightStrategy, BlackLittermanStrategy, RiskParityStrategy
 from src.visualizations.plotting import create_professional_tearsheet
 from src.models.predictor import ProductionStockRegressor
 
@@ -35,18 +35,20 @@ def load_data():
 def run_full_backtest():
     # 1. Grab data
     prices = load_data()
-    tickers = list(prices.columns)
+    all_columns = list(prices.columns) # Filter tickers
+    tickers = [t for t in all_columns if t != "UK_10Y_Yield"] # Everything except gilt yield
     
     # 2. Pick benchmark for the chart
     # Just using the first asset as a baseline for now
-    benchmark_prices = prices.iloc[:, 0] 
+    benchmark_prices = prices[tickers[0]]
 
     print("\n--- 🚀 Kicking off simulation ---")
-
+    if "UK_10Y_Yield" in all_columns:
+        print("--- 📌 Macro context: UK 10Y Yield detected for risk-adjusted metrics ---")
     # 3. Pick the Strategy
     # TODO: Swap this for BlackLittermanStrategy once the optimiser logic is ready.
     # Using Equal Weights (1/N) for now just to test the pipeline works.
-    strat = EqualWeightStrategy(tickers=tickers)
+    strat = RiskParityStrategy(tickers=tickers, cov_window=252) # 1 year rolling covariance for risk parity weights
 
     # 4. Engine setup
     bt = Backtester(
@@ -82,7 +84,7 @@ def run_full_backtest():
     create_professional_tearsheet(
         results=results_dict, 
         benchmark_prices=benchmark_prices, 
-        title="Portfolio Strategy Audit (2020-2025)"
+        title="Portfolio Strategy Audit (Ending {DATA_CUTOFF_DATE})",
     )
 
 if __name__ == "__main__":
