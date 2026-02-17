@@ -1,14 +1,13 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% apcr-contemporary.cls, v1, 10/12/2025
-% Developed by Overleaf, Edited by AP Capital Research
+% scr-contemporary.cls, v1, 10/12/2025
+% Developed by Overleaf, Edited by Surrey Capital Research
 % 
 % This class file enables authors to prepare 
-% manuscripts for submission to AP Capital Research using
+% manuscripts for submission to Surrey Capital Research using
 % the 'contemporary' layout.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-\ProvidesClass{apcr-contemporary}[10/12/2025, v1]
-
+\ProvidesClass{scr-contemporary}[10/12/2025, v1]
 \newif\if@numrefs
 \newif\if@alpharefs
 
