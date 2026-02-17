@@ -34,20 +34,17 @@
 \setbeamerfont{title in head/foot}{size=\scriptsize}
 \setbeamerfont{date in head/foot}{size=\scriptsize}
 
-\setbeamertemplate{footline}{
-  \leavevmode%
-  \hbox{%
-    \begin{beamercolorbox}[wd=.34\paperwidth,ht=2.0ex,dp=0.9ex,left]{author in head/foot}%
-      \hspace*{1.2ex}\insertshortauthor
-    \end{beamercolorbox}%
-    \begin{beamercolorbox}[wd=.44\paperwidth,ht=2.0ex,dp=0.9ex,center]{title in head/foot}%
-      \insertshorttitle
-    \end{beamercolorbox}%
-    \begin{beamercolorbox}[wd=.22\paperwidth,ht=2.0ex,dp=0.9ex,right]{date in head/foot}%
-      \insertshortdate{}\hspace*{1.2ex}\insertframenumber{} / \inserttotalframenumber\hspace*{1.2ex}
-    \end{beamercolorbox}%
-  }%
-  \vskip0pt%
+\setbeamertemplate{footline}{                                                                                                    
+\leavevmode%                                                                                                                   
+\hbox{%                                                                                                                        
+    \begin{beamercolorbox}[wd=.5\paperwidth,ht=2.0ex,dp=0.9ex,left]{author in head/foot}%                                        
+    \hspace*{1.2ex}\insertshortauthor                                                                                          
+    \end{beamercolorbox}%                                                                                                        
+    \begin{beamercolorbox}[wd=.5\paperwidth,ht=2.0ex,dp=0.9ex,right]{date in head/foot}%                                         
+    \hspace*{1.2ex}\insertframenumber{} / \inserttotalframenumber\hspace*{1.2ex}                             
+    \end{beamercolorbox}%                                                                                                        
+}%                                                                                                                             
+\vskip0pt%                                                                                                                     
 }
 
 
@@ -409,7 +406,7 @@ We're asking: "does it actually work?"}
 \textbf{GitHub Repository}\\
 \vspace{0.5em}
 \normalsize
-\hyperlink{GitHub Link}{github.com/AP-Capital-Research/deep-dive-into-portfolio-optimisation}
+\hyperlink{GitHub Link}{github.com/Surrey-Capital-Research/deep-dive-into-portfolio-optimisation}
 
 \vspace{2em}
 
@@ -426,28 +423,5 @@ Contact us at [rd01004@surrey.ac.uk]
 \end{center}
 
 \end{frame}
-
-% Thank You
-{
-\watermark
-\begin{frame}
-\begin{center}
-\Huge
-\textcolor{scrdarkblue}{\textbf{Thank You}}
-
-\vspace{2em}
-
-\Large
-We're excited to share our findings\\
-with the quant finance community
-
-\vspace{1em}
-
-\normalsize
-\textit{Stay tuned for the full results}
-\end{center}
-
-\end{frame}
-}
 
 \end{document}
