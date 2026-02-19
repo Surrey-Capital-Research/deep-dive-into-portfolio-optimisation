@@ -1,0 +1,18 @@
+# Data Acquisition & Manipulation
+pandas
+numpy
+yfinance
+
+# Quantitative Optimisation & Portfolio Math
+PyPortfolioOpt
+scikit-learn
+cvxpy
+
+# AI & Signal Processing 
+tensorflow
+keras
+scipy
+
+# Visualisation & Reporting
+matplotlib
+seaborn

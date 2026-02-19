@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 import pandas as pd
 import numpy as np
 from typing import Callable
+from src.models.optimisers import run_mvo_optimization
 
 from src.models.risk_parity import compute_risk_parity_weights
 from src.models.black_litterman import (
@@ -62,7 +63,6 @@ class EqualWeightStrategy(BaseStrategy):
         current_positions: pd.Series,
         cash: float,
     ) -> pd.Series:
-        # Only consider tickers that are in past_prices
         available = [t for t in self.tickers if t in past_prices.columns]
 
         if not available:
@@ -129,34 +129,28 @@ class BlackLittermanStrategy(BaseStrategy):
         current_positions: pd.Series,
         cash: float,
     ) -> pd.Series:
-        # Restrict to our universe and a rolling window for cov estimation
         past_prices = past_prices[self.tickers].dropna(how="all")
         if past_prices.shape[0] < self.cov_window:
-            # fall back to market weights
             return self.market_weights.copy()
 
         window_prices = past_prices.iloc[-self.cov_window :]
         returns = window_prices.pct_change().dropna()
         cov = returns.cov()
 
-        # Equilibrium returns
         mu_prior = implied_equilibrium_returns(
             cov=cov,
             market_weights=self.market_weights,
             risk_aversion=self.risk_aversion,
         )
 
-        # Past data up to decision_date
-        # We add Omega here so it can catch all three values from your FFT builder
         P, Q, Omega = self.view_builder(window_prices, decision_date)
         
         if P.size == 0:
-            # No views: just use prior + MVO
-            # replace return with weights.reindex(self.tickers).fillna(0.0) when MVO done
-            # weights = self.optimizer(mu_prior, cov)
+
             return self.market_weights.copy()
 
-        Omega = build_diagonal_omega(Q, self.view_uncertainty_scalar)
+        if Omega is None:
+            Omega = build_diagonal_omega(Q, self.view_uncertainty_scalar)
 
         mu_bl = black_litterman_posterior(
             mu_prior=mu_prior,
@@ -202,3 +196,101 @@ class RiskParityStrategy(BaseStrategy):
 
         return pd.Series(weights, index=self.tickers)
 
+class MVOStrategy(BaseStrategy):
+    """
+    Institutional Mean-Variance Optimization Strategy.
+    Uses Ledoit-Wolf shrinkage, EMA returns, and position limits via the optimizers module.
+    """
+    def __init__(self, tickers: list[str], rf_ticker: str = "UK_10Y_Yield", cov_window: int = 252):
+        self.tickers = list(tickers)
+        self.rf_ticker = rf_ticker
+        self.cov_window = cov_window
+
+    def get_target_weights(
+        self,
+        decision_date: pd.Timestamp,
+        past_prices: pd.DataFrame,
+        current_positions: pd.Series,
+        cash: float
+    ) -> pd.Series:
+        
+        asset_prices = past_prices[self.tickers].dropna(how="all")
+        
+        if asset_prices.shape[0] < self.cov_window:
+            return pd.Series(1.0 / len(self.tickers), index=self.tickers)
+        
+        recent_prices = asset_prices.iloc[-self.cov_window:] 
+
+        if self.rf_ticker in past_prices.columns:
+
+            current_rf = past_prices[self.rf_ticker].ffill().iloc[-1] / 100.0
+        else:
+            current_rf = 0.0
+
+        weights_dict = run_mvo_optimization(
+            prices_df=recent_prices, 
+            rf_rate=current_rf,
+            max_position_size=0.20, 
+            gamma_reg=0.1
+        )
+
+        return pd.Series(weights_dict).reindex(self.tickers).fillna(0.0)
+    
+from pypfopt import expected_returns, risk_models, EfficientFrontier, objective_functions
+import pandas as pd
+import numpy as np
+
+class RegimeSwitchingMVOStrategy(BaseStrategy):
+    """
+    Fast Momentum MVO.
+    Combines a rapid 50-day crash filter with uncaged 3-month momentum.
+    """
+    def __init__(self, tickers: list[str], rf_ticker: str = "UK_10Y_Yield", cov_window: int = 126, trend_window: int = 50):
+        self.tickers = list(tickers)
+        self.rf_ticker = rf_ticker
+        self.cov_window = cov_window
+        self.trend_window = trend_window
+
+    def get_target_weights(
+        self,
+        decision_date: pd.Timestamp,
+        past_prices: pd.DataFrame,
+        current_positions: pd.Series,
+        cash: float
+    ) -> pd.Series:
+        
+        asset_prices = past_prices[self.tickers].dropna(how="all")
+        warmup_period = max(self.cov_window, self.trend_window)
+        
+        if asset_prices.shape[0] < warmup_period:
+            return pd.Series(1.0 / len(self.tickers), index=self.tickers)
+        
+        recent_prices = asset_prices.iloc[-self.cov_window:]
+
+        current_price = asset_prices.iloc[-1]
+        sma = asset_prices.tail(self.trend_window).mean()
+        uptrend_assets = current_price[current_price > sma].index.tolist()
+
+        if len(uptrend_assets) < 3:
+            try:
+                S_safe = risk_models.CovarianceShrinkage(recent_prices).ledoit_wolf()
+                ef_safe = EfficientFrontier(None, S_safe, weight_bounds=(0.0, 1.0))
+                safe_weights = ef_safe.min_volatility()
+                return pd.Series(dict(ef_safe.clean_weights())).reindex(self.tickers).fillna(0.0)
+            except Exception:
+                return pd.Series(1.0 / len(self.tickers), index=self.tickers)
+        
+        uptrend_prices = recent_prices[uptrend_assets]
+        current_rf = past_prices[self.rf_ticker].ffill().iloc[-1] / 100.0 if self.rf_ticker in past_prices.columns else 0.0
+
+        try:
+            mu = expected_returns.ema_historical_return(uptrend_prices, span=63)
+            S = risk_models.CovarianceShrinkage(uptrend_prices).ledoit_wolf()
+            ef = EfficientFrontier(mu, S, weight_bounds=(0.0, 0.50))
+            
+            weights_dict = ef.max_sharpe(risk_free_rate=current_rf)
+            return pd.Series(dict(ef.clean_weights())).reindex(self.tickers).fillna(0.0)
+            
+        except Exception:
+            fallback = pd.Series(1.0 / len(uptrend_assets), index=uptrend_assets)
+            return fallback.reindex(self.tickers).fillna(0.0)
