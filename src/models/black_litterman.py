@@ -26,7 +26,11 @@ def implied_equilibrium_returns(
     pd.Series
         Implied equilibrium returns (index = tickers).
     """
+
+    # Ensure indicers align and cov is ordered correctly
     cov = cov.loc[market_weights.index, market_weights.index]
+    # BL formula: mu_prior = risk_aversion * Sigma * w_m
+    # Compute the vector of implied returns
     mu = risk_aversion * cov.values @ market_weights.values
     return pd.Series(mu, index=market_weights.index)
 
@@ -63,9 +67,11 @@ def black_litterman_posterior(
     """
     Sigma = cov.values
     mu0 = mu_prior.values
+    # Scale covariance by tau to reflect uncertainty in the prior
     tauSigma = tau * Sigma
     inv_tauSigma = np.linalg.inv(tauSigma)
     inv_Omega = np.linalg.inv(Omega)
+    # Combine info of matrices
     middle = inv_tauSigma + P.T @ inv_Omega @ P
     rhs = inv_tauSigma @ mu0 + P.T @ inv_Omega @ Q
     mu_bl = np.linalg.solve(middle, rhs)

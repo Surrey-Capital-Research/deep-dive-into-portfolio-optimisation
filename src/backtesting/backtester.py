@@ -50,7 +50,7 @@ class Backtester:
         self.rebalance_freq = rebalance_freq
         self.cost_model = cost_model
 
-        self.tickers = list(self.prices.columns)
+        self.tickers = self.strategy.tickers
 
     def _get_rebalance_dates(self) -> pd.DatetimeIndex:
         """
@@ -62,7 +62,6 @@ class Backtester:
         all_dates = self.prices.index
         freq_ends = self.prices.resample(self.rebalance_freq).last().index
 
-        # First trading day is included to invest immediately
         rebalance_dates = freq_ends.union([all_dates[0]])
 
         return rebalance_dates
@@ -73,7 +72,6 @@ class Backtester:
         positions = pd.Series(0.0, index=self.tickers)
         cash = self.initial_capital
 
-        # Storing history
         equity_curve = pd.Series(index=dates, dtype=float)
         positions_history = pd.DataFrame(index=dates, columns=self.tickers, dtype=float)
         trades_records = []
@@ -81,7 +79,6 @@ class Backtester:
         for current_date in dates:
             todays_prices = self.prices.loc[current_date]
 
-            # Rebalance if today is a rebalance date
             if current_date in rebalance_dates:
                 past_prices = self.prices.loc[:current_date]
 
@@ -125,8 +122,7 @@ class Backtester:
                         }
                     )
                 )
-
-            # Mark-to-market at close
+            # Record end-of-day wealth and positions
             equity_curve.loc[current_date] = cash + float(
                 (positions * todays_prices).sum()
             )
@@ -145,29 +141,37 @@ class Backtester:
             metrics=metrics,
         )
 
-    @staticmethod
-    def _compute_metrics(equity_curve: pd.Series) -> dict:
+    
+    def _compute_metrics(self, equity_curve: pd.Series) -> dict:
         """
-        Compute simple performance metrics from a daily equity curve.
+        Compute institutional performance metrics, including Risk-Adjusted Sharpe.
         """
         equity_curve = equity_curve.dropna()
         if equity_curve.empty:
             return {}
-
-        # Returns daily
         rets = equity_curve.pct_change().dropna()
 
         total_return = equity_curve.iloc[-1] / equity_curve.iloc[0] - 1.0
         n_days = rets.shape[0]
         annual_factor = 252.0
-
+        # Compounded Annual Growth Rate (CAGR)
         cagr = (equity_curve.iloc[-1] / equity_curve.iloc[0]) ** (
             annual_factor / n_days
         ) - 1.0
 
+        # Realised vol
         vol = rets.std() * np.sqrt(annual_factor)
-        sharpe = cagr / vol if vol > 0 else np.nan
+        # Risk-free adjustment for sharpe ratio
+        rf_col = "UK_10Y_Yield"
+        if rf_col in self.prices.columns:
+            avg_rf_rate = self.prices[rf_col].mean() / 100.0
+        else:
+            avg_rf_rate = 0.0
 
+
+        sharpe = (cagr - avg_rf_rate) / vol if vol > 0 else np.nan
+
+        # Max drawdown calc
         running_max = equity_curve.cummax()
         drawdown = equity_curve / running_max - 1.0
         max_dd = drawdown.min()

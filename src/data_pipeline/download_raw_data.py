@@ -1,13 +1,21 @@
 import os
 import yfinance as yf
 import pandas as pd
+import logging
 
+# Config for terminal feedback during data download
+logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
+logger = logging.getLogger(__name__)
+
+# Global horizons
 START_DATE = "2015-01-01"
 END_DATE = "2026-01-01"
 INTERVAL = "1d"
 
-BASE_DATA_DIR = "data"
+# Ensure raw data is isolated from processed output
+RAW_DATA_DIR = os.path.join("data", "raw")
 
+# Multi-asset universe
 ASSET_GROUPS = {
     "equities": [
         "HSBA.L", "LLOY.L", "BARC.L", "SHEL.L", "BP.L",
@@ -26,13 +34,14 @@ ASSET_GROUPS = {
     ],
 }
 
-
 def ensure_dir(path: str):
+    """Helper for dir creation."""
     os.makedirs(path, exist_ok=True)
 
-
 def download_one_ticker(ticker: str) -> pd.DataFrame:
-    print(f"Downloading {ticker} from {START_DATE} to {END_DATE}...")
+    """Wrapper for yfinance download with standard parameters."""
+    logger.info(f"Fetching {ticker} via yfinance API...")
+    
     df = yf.download(
         ticker,
         start=START_DATE,
@@ -42,14 +51,16 @@ def download_one_ticker(ticker: str) -> pd.DataFrame:
         progress=False,
         actions=False,
     )
+    
     if df.empty:
-        print(f"WARNING: no data returned for {ticker}")
+        logger.warning(f"No data returned for {ticker}. Check ticker symbol/delisting status.")
     return df
 
-
 def main():
+    """Batch download process for the asset universe."""
     for group, tickers in ASSET_GROUPS.items():
-        out_dir = os.path.join(BASE_DATA_DIR, group)
+        # Group-based directory structure
+        out_dir = os.path.join(RAW_DATA_DIR, group)
         ensure_dir(out_dir)
 
         for ticker in tickers:
@@ -57,12 +68,16 @@ def main():
             if df.empty:
                 continue
 
+            # Flatten index to ensure 'Date' is a column for the ETL step
             df = df.reset_index()
-            fname = f"{ticker}.csv"
+            
+            # Sanitise filename 
+            safe_ticker = ticker.replace("^", "")
+            fname = f"{safe_ticker}.csv"
             out_path = os.path.join(out_dir, fname)
+            
             df.to_csv(out_path, index=False)
-            print(f"Saved {ticker} to {out_path}")
-
+            logger.info(f"Buffered {ticker} to {out_path}")
 
 if __name__ == "__main__":
     main()
