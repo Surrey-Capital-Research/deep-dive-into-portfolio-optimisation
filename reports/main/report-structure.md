@@ -321,6 +321,24 @@ $$
 \text{Turnover}_t = \sum_{i=1}^n |w_{i,t} - w_{i,t-1}|
 $$
 
+**Value at Risk (VaR):**
+
+$$
+\text{VaR}_\alpha = -\inf\{x \in \mathbb{R} : P(r_p \leq x) > \alpha\}
+$$
+
+**Conditional Value at Risk (CVaR):**
+
+$$
+\text{CVaR}_\alpha = -\frac{1}{1-\alpha}\int_0^\alpha \text{VaR}_u \, du = \mathbb{E}\left[-r_p \mid r_p \leq -\text{VaR}_\alpha\right]
+$$
+
+**Weight Stability:**
+
+$$
+\text{WS} = 1 - \frac{1}{T-1}\sum_{t=2}^{T}\sum_{i=1}^{n}|w_{i,t} - w_{i,t-1}|
+$$
+
 Possibly more may be added
 --------------------------
 
