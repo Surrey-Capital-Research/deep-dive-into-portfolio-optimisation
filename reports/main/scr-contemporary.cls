@@ -77,9 +77,9 @@
 \renewcommand\AB@authnote[1]{}
 \renewcommand\AB@affilnote[1]{}
 
-% APCR Specific Defaults
-\def\@jname{AP Capital Research}
-\def\@jlogo{apcr-logo.pdf}
+% SCR Specific Defaults
+\def\@jname{Surrey Capital Research}
+\def\@jlogo{scr-logo.pdf}
 \def\@secondlogo{} % Optional second logo
 
 \newcommand{\jname}[1]{\def\@jname{#1}}
@@ -101,7 +101,7 @@
 \def\@runningtitle{}
 \def\@corraddress{}
 \def\@authnotes{}
-\definecolor{jcolour}{RGB}{0,70,128} % Default APCR blue color (change RGB values for different color)
+\definecolor{jcolour}{RGB}{0,70,128} % Default SCR blue color (change RGB values for different color)
 
 \newcommand{\runningauthor}[1]{\def\@runningauthor{#1}}
 \newcommand{\runningtitle}[1]{\def\@runningtitle{#1}}
@@ -201,7 +201,7 @@
   \textblockorigin{4pc+6.64pt}{4pc+6pt}
   %%%%
   \begin{textblock*}{21pc}(0pt,0pt)
-  % APCR logo
+  % SCR logo
   \ifdefempty{\@jlogo}{}{%
   \IfFileExists{\@jlogo}{%
     \includegraphics[height=1.3\@gscitedetailsheight]{\@jlogo}
