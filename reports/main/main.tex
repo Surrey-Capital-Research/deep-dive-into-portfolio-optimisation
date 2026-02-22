@@ -55,23 +55,22 @@ Keyword1; Keyword2; Keyword3; Keyword4; Keyword5
 \end{keypoints*}
 
 \section{Introduction}
-Portfolio optimisation is a process of strategically selecting a diverse range of assets to build an 
-investment portfolio that offers the maximum expected returns for a given level of risk. This can be 
-calculated using mathematical models, of which we have selected four: Equally Weighted, Markowitz 
-mean/variance optimisation, Black-Litterman and Risk Parity. Together, these models provide a strong 
-theoretical foundation. While Mean-Variance optimisation is central to modern portfolio theory, it often
-performs poorly in practice due to estimation errors. Therefore, an inclusion of Bayesian frameworks and
-risk-based allocation methods is designed to improve robustness and empirical performance.
+\subsection{The Portfolio Allocation Problem}
+\indent \indent The portfolio allocation problem is the fundamental question in investment management. 
+It asks: How should capital be distributed across available investment opportunities to best achieve 
+an investor's objectives? \\
+\indent The problem was intractable until 1952, when Harry Markowitz published \textit{Portfolio Selection} in the 
+\textit{Journal of Finance} and turned it into a clean optimisation problem, and the “efficient frontier” 
+gave investors a principled answer. Markowitz's mean variance model minimises portfolio variance for a given 
+level of expected return. It was revolutionary in the consideration of variance as the risk, standing as a 
+hallmark of modern portfolio theory. In practice however, the model has proven difficult to implement reliably. \\
+\indent Michaud (1989) challenged this view directly, arguing that small estimation errors in expected 
+returns produce wildly unstable portfolio recommendations. \\
+\indent In 2009, DeMiguel et al. delivered a provocative result: he found that even sophisticated strategies 
+incorporating shrinkage estimators and Bayesian methods failed to consistently outperform 1/N out-of-sample, 
+suggesting that estimation error dominates theoretical optimality for typical portfolio problems. This tension 
+between the theoretical elegance of optimisation and its empirical fragility motivates the present study. 
 
-This report conducts a rigorous empirical comparison of portfolio optimisation, which is applied to a 
-selected 18-asset portfolio spanning 2015-2025. The asset universe includes: UK equities, government 
-bonds, precious metals and broader commodities. It defines the scope of our analysis so that findings 
-are realistic and diversified in the investment universe. 
-
-The objective of this project is to evaluate the risk-return performance by implementing and backtesting
-multiple portfolio techniques to understand characteristics, trade-offs and practical applicability. 
-While comparing classical optimisation techniques to alternative approaches to optimise empirical 
-robustness in a real-world investment setting.
 
 \subsection{Background and Research Objectives}
 Provide the necessary background information for the reader to understand the context of your research. 
