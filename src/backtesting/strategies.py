@@ -79,14 +79,12 @@ class MVOStrategy(BaseStrategy):
     def __init__(
         self,
         tickers: list[str],
-        risk_free_rate: float = 0.04, # Default to 0.04 rf if series absent
+        risk_free_rate: float | pd.Series = 0.04, # Default to 0.04 rf if series absent
         cov_window: int = 252,
-        max_weight: float | pd.Series = 0.2
     ):
         self.tickers = list(tickers)
         self.risk_free_rate = risk_free_rate
         self.cov_window = cov_window
-        self.max_weight = max_weight
 
     def get_target_weights(
         self,
@@ -134,7 +132,7 @@ class BlackLittermanStrategy(BaseStrategy):
         view_builder: Callable[
             [pd.DataFrame, pd.Timestamp], tuple[np.ndarray, np.ndarray]
         ],
-        optimiser: Callable[[pd.Series, pd.DataFrame], pd.Series],
+        optimiser: Callable[[pd.Series, pd.DataFrame, pd.Timestamp], pd.Series],
         view_uncertainty_scalar: float = 0.5,
         cov_window: int = 252,
     ):
@@ -196,7 +194,7 @@ class BlackLittermanStrategy(BaseStrategy):
         P, Q, Omega = self.view_builder(window_prices, decision_date)
         
         if P.size == 0:
-            return self.optimiser(mu_prior, cov)
+            return self.optimiser(mu_prior, cov, decision_date)
 
         Omega = build_diagonal_omega(Q, self.view_uncertainty_scalar)
 
@@ -209,7 +207,7 @@ class BlackLittermanStrategy(BaseStrategy):
             tau=self.tau,
         )
 
-        weights = self.optimiser(mu_bl, cov)
+        weights = self.optimiser(mu_bl, cov, decision_date)
         weights = weights.reindex(self.tickers).fillna(0.0)
         if weights.sum() != 0:
             weights = weights / weights.sum()
