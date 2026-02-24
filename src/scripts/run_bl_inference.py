@@ -46,8 +46,8 @@ def fft_view_builder(past_prices, decision_date):
     return np.array(P_list), np.array(Q_list), np.diag(Omega_diag)
 
 
-# --- 2. THE PLACEHOLDER OPTIMIZER ---
-def dummy_optimizer(mu, cov):
+# --- 2. THE PLACEHOLDER OPTIMISER ---
+def dummy_optimiser(mu, cov):
     """
     TECK DEBT NOTE: My teammate is still finishing the MVO 'Chef'.
     For now, I'm just outputting equal weights so we can verify the 
@@ -83,7 +83,7 @@ def main():
         risk_aversion=3.0,
         tau=0.05,
         view_builder=instant_view_builder,
-        optimizer=dummy_optimizer,
+        optimiser=dummy_optimiser,
     )
 
     # 4. Get the (Dummy) Weights

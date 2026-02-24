@@ -18,6 +18,9 @@ planning/
 *.log
 *.out
 *.synctex.gz
+*.toc
+*.snm
+*.nav
 
 # AI slop
 CLAUDE.md
