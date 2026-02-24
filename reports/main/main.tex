@@ -87,6 +87,77 @@ Describe the data you used, where you got it from (e.g., Bloomberg, Refinitiv, w
 took to clean, process, or transform it. Mention the time period and frequency of the data.
 
 \subsection{Analytical Models}
+\subsubsection{The equal-weight portfolio}
+
+The equal-weight (1/N) portfolio assigns an identical weight of 1/N to each asset in the portfolio, regardless of any asset-specific characteristics such as return, volatility, or correlation. 
+\citet{DeMiguel2009} tested 14 optimisation models across 7 datasets. None consistently outperformed the naive equal-weight portfolio: 
+\[
+  w_i^{\mathrm{EW}} = \frac{1}{n}.
+\]
+\paragraph{Why?} When expected returns are estimated from historical data in order to determine optimal portfolio weights, the estimates improve as more data is collected, but they do so slowly. Formally, the estimation error decays as.
+\[
+  \hat{\mu} - \mu = \mathcal{O}\!\left(\frac{1}{\sqrt{T}}\right).
+\]
+where $T$ is the number of observations. 
+
+Because the error shrinks at rate $\frac{1}{\sqrt{T}}$, halving the error requires four times as much data, meaning that with monthly data and realistic return distributions, approximately 500 years of observations are required for statistically reliable estimates. The equal-weight portfolio sidesteps this problem entirely: by assigning a fixed weight to each asset, it requires no parameter estimation and is therefore immune to estimation error by construction.
+
+The cost of this simplicity, however, is that the portfolio ignores all information about assets' risk and return characteristics, makes no attempt to diversify risk efficiently, and cannot adapt to changing market conditions.
+
+
+% ─────────────────────────────────────────────
+\subsubsection{Mean–Variance Optimisation}
+
+\paragraph{Origins} \citet{Markowitz 1952} formulated portfolio selection as a constrained optimisation problem: minimise portfolio variance for a given level of expected return. Formally:
+\[
+ \min_{\mathbf{w}} \frac{1}{2} \mathbf{w}^\top \boldsymbol{\Sigma} \mathbf{w}
+\]
+\text{subject to:} 
+\[
+\quad \mathbf{w}^\top \boldsymbol{\mu} = \mu^* \quad \text{(return constraint)}
+\]
+\[
+\mathbf{w}^\top \mathbf{1} = 1 \quad \text{(budget constraint)}
+\]
+\paragraph{What are two constraints?} The budget constraint ensures the weights represent a valid allocation of wealth. Without it, the optimiser will reduce variance by allocating weights toward zero. The return constraint pins the portfolio to a specific point on the risk-return spectrum. Together, these two constraints define the problem: there is a unique minimum-variance portfolio for each target return μ∗\mu^*
+μ∗. 
+
+Because the objective is quadratic and the constraints are linear equalities, we cannot solve the problem by direct substitution (two constraints, n unknowns). We therefore use the method of Lagrange multipliers. The Lagrangian formulation is:
+
+\[
+  \mathcal{L}(w, \lambda, \gamma)
+    = \frac{1}{2}\,w^\top \Sigma w
+      - \lambda\!\left(w^\top \mu - \mu_p\right)
+      - \gamma\!\left(\mathbf{1}^\top w - 1\right).
+\]
+where $\lambda$ and $\gamma$ are the Lagrange multipliers associated with the return and budget constraints, respectively. Intuitively, $\lambda$ captures the marginal cost of requiring a higher return (i.e. how much additional variance must be accepted per unit increase in $\mu^*$), and $\gamma$ enforces full investment.
+
+Taking the first-order condition:
+\[
+  \frac{\partial \mathcal{L}}{\partial w} = \Sigma w - \lambda \mu - \gamma \mathbf{1} = \mathbf{0}.
+\]
+
+Solving gives:
+\[
+  w^* = \lambda\,\Sigma^{-1}\mu + \gamma\,\Sigma^{-1}\mathbf{1}.
+\]
+
+Imposing the budget and return constraints leads to the following two-fund theorem: all efficient portfolios can be expressed as a linear combination of any two distinct efficient portfolios.
+\[
+  w_A = \frac{\Sigma^{-1}\mathbf{1}}{\mathbf{1}^\top \Sigma^{-1}\mathbf{1}},
+  \qquad
+  w_B = \frac{\Sigma^{-1}\mu}{\mathbf{1}^\top \Sigma^{-1}\mu}.
+\]
+
+The maximum \emph{Sharpe ratio} portfolio is:
+\[
+  w_{\mathrm{MSR}}
+    = \frac{\Sigma^{-1}(\mu - r_f \mathbf{1})}
+           {\mathbf{1}^\top \Sigma^{-1}(\mu - r_f \mathbf{1})}.
+\]
+\paragraph{The problem in practice.} Despite its theoretical elegance, Markowitz optimisation suffers from a well-documented problem. As mentioned above, the solution depends critically on $\boldsymbol{\mu}$ and $\boldsymbol{\Sigma}$, both estimated from historical data. Small errors in $\boldsymbol{\mu}$ can cause large shifts in optimal weights. \citet{Michaud 1989} characterised the optimiser as an ``error maximiser'': it systematically overweights assets with overestimated returns and underestimated variances.
+
+
 Describe the quantitative or qualitative models used in your analysis. Include mathematical formulations if 
 applicable. For example, if you are using a regression model, you would specify it here:
 \begin{equation}
