@@ -70,14 +70,19 @@ def max_sharpe_weights(
     return w
 
 
-def make_mvo_optimiser(risk_free_rate):
+def make_mvo_optimiser(risk_free_rate: float | pd.Series = 0.05):
 
-    def optimiser(mu: pd.Series, cov: pd.Series):
+    def optimiser(mu: pd.Series, cov: pd.Series, decision_date: pd.Timestamp):
+        if isinstance(risk_free_rate, pd.Series):
+            rf = float(risk_free_rate.asof(decision_date)) # type: ignore
+        else:
+            rf = risk_free_rate
+
         tickers = list(mu.index)
-        mu_annual = mu.to_numpy(dtype="float") * 252
-        cov_annual = cov.to_numpy(dtype="float") * 252
+        _mu = mu.to_numpy(dtype="float")
+        _cov = cov.to_numpy(dtype="float")
 
-        weights = max_sharpe_weights(mu_annual, cov_annual, risk_free_rate)
+        weights = max_sharpe_weights(_mu, _cov, rf)
         return pd.Series(weights, index=tickers)
     
     return optimiser

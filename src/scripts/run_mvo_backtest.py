@@ -2,7 +2,7 @@ import pandas as pd
 from src.backtesting.backtester import Backtester
 from src.backtesting.strategies import MVOStrategy
 
-# Load your price data
+# Load price data
 prices = pd.read_csv(
     "data/uk_multi_asset_prices_clean.csv",
     index_col=0,
@@ -13,13 +13,13 @@ rfr = pd.read_csv(
     index_col=0,
     parse_dates=True
 )
-rfr = rfr.squeeze()
+rfr = rfr.squeeze() / 100 # type: ignore
 
 # Create strategy
 strategy = MVOStrategy(
     tickers=prices.columns.tolist(),               
     cov_window=252,
-    risk_free_rate=rfr
+    risk_free_rate=rfr # type: ignore
 )
 
 # Run backtest
