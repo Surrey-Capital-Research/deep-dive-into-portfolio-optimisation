@@ -42,13 +42,16 @@ for name, strategy in strategies.items():
     results[name] = bt.run().metrics
 
 # Print comparison table
-metrics = ["total_return", "CAGR", "volatility", "Sharpe", "max_drawdown"]
+metrics = ["total_return", "CAGR", "volatility", "Sharpe", "Sortino", "max_drawdown", "95% VaR", "95% CVaR"]
 df = pd.DataFrame(results, index=metrics).T
 df["total_return"] = df["total_return"].map("{:.1%}".format)
 df["CAGR"] = df["CAGR"].map("{:.1%}".format)
 df["volatility"] = df["volatility"].map("{:.1%}".format)
 df["Sharpe"] = df["Sharpe"].map("{:.2f}".format)
+df["Sortino"] = df["Sortino"].map("{:.2f}".format)
 df["max_drawdown"] = df["max_drawdown"].map("{:.1%}".format)
+df["95% VaR"] = df["95% VaR"].map("{:.1%}".format)
+df["95% CVaR"] = df["95% CVaR"].map("{:.1%}".format)
 
 print("\n--- Comparative Results ---")
 print(df.to_string())
