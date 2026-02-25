@@ -31,10 +31,10 @@
 \RequirePackage[T1]{fontenc}
 \RequirePackage{ifpdf}
 \RequirePackage{microtype}
-\RequirePackage{euler}
+% \RequirePackage{euler}
 \RequirePackage{merriweather}
 \renewcommand{\ttdefault}{lmtt}
-\RequirePackage[italic]{mathastext}
+% \RequirePackage[italic]{mathastext}
 \RequirePackage{relsize}
 \RequirePackage{ragged2e}
 \RequirePackage{xcolor}

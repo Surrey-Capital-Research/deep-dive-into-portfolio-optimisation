@@ -4,6 +4,12 @@
 \usepackage{graphicx}
 \usepackage{siunitx}
 \usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{caption}
+\captionsetup{justification=centering}
+\let\mathscr\undefined
+\usepackage{newpxmath}
+\usepackage{ragged2e}
 
 % Surrey Capital Research Specifics
 \jname{Surrey Capital Research} % Set the journal name to Surrey Capital Research
@@ -31,6 +37,7 @@
 \maketitle
 
 \begin{abstract}
+  \justifying
 \textbf{Background}:
   Selecting an optimal portfolio allocation across a universe of assets is a central problem in 
   investment management. While mean-variance optimisation, first proposed by Markowitz (1952), provides a 
@@ -45,23 +52,23 @@
   Strategies are evaluated using a monthly rebalancing framework and assessed across annualised return, volatility, 
   Sharpe ratio, maximum drawdown and portfolio turnover. \\
 \vspace{0.5mm}
-  \textbf{Results}: 
+  \textbf{Results}:
   We find results broadly consistent with DeMiguel et al. (2009), with the naive benchmark 
   proving difficult to displace on a risk-adjusted basis over the full sample period. The optimisation 
   strategies exhibit meaningfully different risk profiles, however, suggesting that Sharpe ratio alone does not 
   fully capture the practical trade-offs between approaches. \\
 \end{abstract}
 
-\begin{keywords}
-Portfolio optimisation ; mean-variance ; Black-Litterman ; Risk Parity ; backtesting
-\end{keywords}
 \end{frontmatter}
 
 \begin{keypoints*}
 \begin{itemize}
-\item Key finding or takeaway 1.
-\item Key finding or takeaway 2.
-\item Key finding or takeaway 3.
+  \item The equal-weight portfolio is robust because it does not rely on 
+  estimated parameters and is therefore unaffected by estimation error.
+  \item The Efficient Frontier is the set of portfolios that deliver the minimum 
+  possible variance for each level of expected return.
+  \item Empirical evidence suggests that many optimisation models fail to 
+  consistently outperform the equal-weight portfolio out of sample.
 \end{itemize}
 \end{keypoints*}
 
@@ -107,105 +114,214 @@ full-period performance metrics and a breakdown by market
 regime. Section 5 discusses the findings and their practical 
 implications. Section 6 concludes.
 
-\section{Methodology}
+\section{Literature and Theoretical Background}
 
 This section details the design of your study, the data used, the models applied, and the analytical framework. 
 The goal is to provide enough detail for another researcher to replicate your work.
 
-\subsection{Data Acquisition and Processing}
+\subsection{Notation}
 Describe the data you used, where you got it from (e.g., Bloomberg, Refinitiv, web scraping), and any steps you 
 took to clean, process, or transform it. Mention the time period and frequency of the data.
 
-\subsection{Analytical Models}
+\subsection{The Equal Weight Puzzle}
 
-\subsubsection{The equal-weight portfolio}
-
-The equal-weight (1/N) portfolio assigns an identical weight of 1/N to each asset in the portfolio, regardless of any asset-specific characteristics such as return, volatility, or correlation. 
-\citet{DeMiguel2009} tested 14 optimisation models across 7 datasets. None consistently outperformed the naive equal-weight portfolio: 
+The equal-weight (1/N) portfolio assigns an identical weight of 1/N to each asset in the portfolio, holding N assets, regardless of any asset-specific 
+characteristics such as return, volatility, or correlation. 
+\citet{demiguel_optimal_2009} tested 14 optimisation models across 7 datasets. None consistently outperformed the naive equal-weight portfolio: 
 \[
-  w_i^{\mathrm{EW}} = \frac{1}{n}.
+  w_i = \frac{1}{N} \quad \text{for} \quad 1 \leq i \leq N
 \]
-\paragraph{Why?} When expected returns are estimated from historical data in order to determine optimal portfolio weights, the estimates improve as more data is collected, but they do so slowly. Formally, the estimation error decays as.
+But why? When expected returns are estimated from historical data in order to determine optimal portfolio weights, the estimates 
+improve as more data is collected, but they do so slowly. \newline
+Formally, the estimation error decays as
 \[
-  \hat{\mu} - \mu = \mathcal{O}\!\left(\frac{1}{\sqrt{T}}\right).
+  \hat{\mu} - \mu = \mathcal{O}\!\left(\frac{1}{\sqrt{T}}\right)
 \]
-where $T$ is the number of observations. 
+where $T$ is the number of observations.
 
-Because the error shrinks at rate $\frac{1}{\sqrt{T}}$, halving the error requires four times as much data, meaning that with monthly data and realistic return distributions, approximately 500 years of observations are required for statistically reliable estimates. The equal-weight portfolio sidesteps this problem entirely: by assigning a fixed weight to each asset, it requires no parameter estimation and is therefore immune to estimation error by construction.
-
-The cost of this simplicity, however, is that the portfolio ignores all information about assets' risk and return characteristics, makes no attempt to diversify risk efficiently, and cannot adapt to changing market conditions.
+Because the error shrinks at rate $\frac{1}{\sqrt{T}}$, halving the 
+error requires four times as much data, meaning that with monthly data 
+and realistic return distributions, approximately 500 years of observations 
+are required for statistically reliable estimates, especially since these
+errors are amplified through the term $\Sigma^{-1}\hat{\mu}$. \newline
+\indent The equal-weight portfolio sidesteps this problem entirely: by assigning a fixed weight to each asset, it requires no parameter estimation 
+and is therefore immune to estimation error by construction. \newline
+The cost of this simplicity, however, is that the portfolio ignores all information about assets' risk and return characteristics, makes 
+no attempt to diversify risk efficiently and cannot adapt to changing market conditions.
 
 
 % ─────────────────────────────────────────────
-\subsubsection{Mean–Variance Optimisation}
+\subsection{Mean-Variance Optimisation}
 
-\paragraph{Origins} \citet{Markowitz 1952} formulated portfolio selection as a constrained optimisation problem: minimise portfolio variance for a given level of expected return. Formally:
-\[
- \min_{\mathbf{w}} \frac{1}{2} \mathbf{w}^\top \boldsymbol{\Sigma} \mathbf{w}
+\citet{markowitz_portfolio_1952} formulated \textit{Portfolio Selection} as a constrained optimisation problem: minimise 
+portfolio variance for a given level of expected return.\newline
+Formally:
+\[                                                   
+  \begin{aligned}
+  \min_{\mathbf{w}} \hat{\sigma} =
+  \mathbf{w}^\top \hat{\boldsymbol{\Sigma}}\ \mathbf{w}
+  \quad \text{s.t.} \quad
+  \mathbf{w}^\top \boldsymbol{\mu} = \mu_p
+  \quad \text{;} \quad 
+  \mathbf{w}^\top\mathbf{1} = 1
+  \end{aligned}
 \]
-\text{subject to:} 
-\[
-\quad \mathbf{w}^\top \boldsymbol{\mu} = \mu^* \quad \text{(return constraint)}
-\]
-\[
-\mathbf{w}^\top \mathbf{1} = 1 \quad \text{(budget constraint)}
-\]
-\paragraph{What are two constraints?} The budget constraint ensures the weights represent a valid allocation of wealth. Without it, the optimiser will reduce variance by allocating weights toward zero. The return constraint pins the portfolio to a specific point on the risk-return spectrum. Together, these two constraints define the problem: there is a unique minimum-variance portfolio for each target return μ∗\mu^*
-μ∗. 
 
-Because the objective is quadratic and the constraints are linear equalities, we cannot solve the problem by direct substitution (two constraints, n unknowns). We therefore use the method of Lagrange multipliers. The Lagrangian formulation is:
+with
+  $\quad \quad \mathbf{w}, \boldsymbol{\mu} \in \mathbb{R}^N 
+  \quad \text{and} \quad
+  \hat{\boldsymbol{\Sigma}} \in \mathbb{R}^{N \times  N} \quad \quad$ 
+as the vector of portfolio weights, the vector of expected returns with
+$\mu_p$ as the scalar target portfolio return and the sample covariance 
+matrix of asset returns estimated from historical data respectively. \\
+
+The first constraint, also known as the return constraint, fixes the portfolio to a 
+specific point at the target level $\mu_p$, pinning the solution to a specific point on the "Efficient Frontier".
+By varying $\mu_p$ across all feasible values, the complete set of minimum-variance 
+portfolios - the Efficient Frontier - is traced out.
+The second constraint, i.e. the budget constraint, ensures the weights represent a valid
+allocation of wealth, hence that the sum of all weights is always equal to $1$. \newline
+\indent It is important to note that no domain-restriction condition is imposed on the budget constraint,
+each $w_i$ may take any real value, in particular, negative ones.
+Practically speaking, a negative weight corresponds to a short position in the associated asset.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.45\textwidth]{../images/plots/efficient_frontier.pdf}
+    \caption{Efficient Frontier estimated using sample covariance}
+    \label{fig:efficient_frontier}
+\end{figure}
+
+Because the objective function is quadratic and the constraints are linear equalities, we cannot solve the problem by direct substitution 
+(two constraints, n unknowns). We therefore use the method of Lagrange multipliers. 
+The Lagrangian formulation is:
 
 \[
-  \mathcal{L}(w, \lambda, \gamma)
-    = \frac{1}{2}\,w^\top \Sigma w
-      - \lambda\!\left(w^\top \mu - \mu_p\right)
-      - \gamma\!\left(\mathbf{1}^\top w - 1\right).
+  \mathcal{L}(\mathbf{w}, \lambda, \gamma)
+      = \mathbf{w}^\top \boldsymbol{\Sigma} \mathbf{w}
+      - \lambda\!\left(\mathbf{w}^\top \boldsymbol{\mu} - \mu_p\right)
+      - \gamma\!\left(\mathbf{1}^\top \mathbf{w} - 1\right)
 \]
-where $\lambda$ and $\gamma$ are the Lagrange multipliers associated with the return and budget constraints, respectively. Intuitively, $\lambda$ captures the marginal cost of requiring a higher return (i.e. how much additional variance must be accepted per unit increase in $\mu^*$), and $\gamma$ enforces full investment.
+
+where $\lambda$ and $\gamma$ are the Lagrange multipliers associated with the return and budget constraints, respectively. 
+Intuitively, $\lambda$ captures the marginal cost of requiring a higher return (i.e. how much additional variance must be accepted 
+per unit increase in $\mu_p$), and $\gamma$ enforces full investment.
 
 Taking the first-order condition:
 \[
-  \frac{\partial \mathcal{L}}{\partial w} = \Sigma w - \lambda \mu - \gamma \mathbf{1} = \mathbf{0}.
+  \frac{\partial \mathcal{L}}{\partial \mathbf{w}} = 2\boldsymbol{\Sigma} \mathbf{w} - \lambda \boldsymbol{\mu} - \gamma \mathbf{1} = \mathbf{0}
 \]
 
 Solving gives:
 \[
-  w^* = \lambda\,\Sigma^{-1}\mu + \gamma\,\Sigma^{-1}\mathbf{1}.
+  \mathbf{w}_p = \frac{\lambda}{2}\,\boldsymbol{\Sigma}^{-1}\boldsymbol{\mu} + \frac{\gamma}{2}\,\boldsymbol{\Sigma}^{-1}\mathbf{1}
 \]
 
-Imposing the budget and return constraints leads to the following two-fund theorem: all efficient portfolios can be expressed as a linear combination of any two distinct efficient portfolios.
+Imposing the budget and return constraints leads to the following two-fund theorem: all efficient portfolios can be expressed as a 
+linear combination of any two distinct efficient portfolios.
 \[
-  w_A = \frac{\Sigma^{-1}\mathbf{1}}{\mathbf{1}^\top \Sigma^{-1}\mathbf{1}},
+  \mathbf{w}_A = \frac{\boldsymbol{\Sigma}^{-1}\mathbf{1}}{\mathbf{1}^\top \boldsymbol{\Sigma}^{-1}\mathbf{1}}
   \qquad
-  w_B = \frac{\Sigma^{-1}\mu}{\mathbf{1}^\top \Sigma^{-1}\mu}.
+  \mathbf{w}_B = \frac{\boldsymbol{\Sigma}^{-1}\boldsymbol{\mu}}{\mathbf{1}^\top \boldsymbol{\Sigma}^{-1}\boldsymbol{\mu}}
 \]
 
-The maximum \emph{Sharpe ratio} portfolio is:
+Note that $\mathbf{w}_A$ is the \emph{global minimum variance} (GMV) portfolio, 
+the leftmost point on the efficient frontier, obtained by dropping the 
+return constraint and minimising variance subject only to full investment:
 \[
-  w_{\mathrm{MSR}}
-    = \frac{\Sigma^{-1}(\mu - r_f \mathbf{1})}
-           {\mathbf{1}^\top \Sigma^{-1}(\mu - r_f \mathbf{1})}.
+  \mathbf{w}_{\mathrm{GMV}}
+    = \frac{\boldsymbol{\Sigma}^{-1}\mathbf{1}}{\mathbf{1}^\top \boldsymbol{\Sigma}^{-1}\mathbf{1}}
 \]
-\paragraph{The problem in practice.} Despite its theoretical elegance, Markowitz optimisation suffers from a well-documented problem. As mentioned above, the solution depends critically on $\boldsymbol{\mu}$ and $\boldsymbol{\Sigma}$, both estimated from historical data. Small errors in $\boldsymbol{\mu}$ can cause large shifts in optimal weights. \citet{Michaud 1989} characterised the optimiser as an ``error maximiser'': it systematically overweights assets with overestimated returns and underestimated variances.
+
+The \emph{maximum Sharpe ratio} portfolio is:
+\[
+  \mathbf{w}_{\mathrm{MSR}}
+    = \frac{\boldsymbol{\Sigma}^{-1}(\boldsymbol{\mu} - r_f \mathbf{1})}
+           {\mathbf{1}^\top \boldsymbol{\Sigma}^{-1}(\boldsymbol{\mu} - r_f \mathbf{1})}
+\]
+Despite its theoretical elegance, Markowitz optimisation suffers from a well-documented problem. 
+As mentioned above, the solution depends critically on $\boldsymbol{\mu}$ and $\boldsymbol{\Sigma}$, both estimated from historical data. \newline
+\indent Small errors in $\mathbf{\mu}$ can cause large shifts in optimal weights.
+\citet{michaud_markowitz_1989} characterised the optimiser as an "error maximiser": it systematically overweights assets with 
+overestimated returns and underestimated variances.
 
 
-
-\subsection{Backtesting or Validation Framework}
+\subsection{Black-Litterman and its Bayesian approach}
 If you are testing a strategy, describe the backtesting framework. Mention key parameters like rebalancing 
 frequency, transaction cost assumptions, and performance metrics used.
 
-\section{Results and Discussion}
+\subsection{Dalio's Risk Parity}
 
-This section presents the key findings from your analyses and interprets their significance. Use figures and tables to present your results clearly.
 
-\subsection{Primary Findings}
+\section{Methodology}
+
+\subsection{Data}
+
+\subsection{Model Implementation}
+
+
+\subsection{Backtesting Framework}
+Backtester method
+
+
+\subsection{Performance Metrics}
+All metrics we're using
+(Return, Sharpe, Sortino, Volatility, CAGR, Max DD, VaR, CVaR)
+
+\section{Results}
+This section presents the key findings from your analyses and interprets their significance. Use figures and tables to 
+present your results clearly.
+
 Present your main results. This could be in the form of tables summarizing statistical outputs, or charts showing trends and relationships.
 
-\begin{figure}[bt!]
-\centering
-% \includegraphics[width=\linewidth]{path/to/your/figure.pdf} % Example: \includegraphics[width=0.8\linewidth]{figures/performance_chart.pdf}
-\caption{Descriptive caption for your figure.}\label{fig:example_figure}
-\end{figure}
+
+\subsection{Main Result: Performance Comparison}
+
+Discuss what your results mean. How do they relate to your initial research question? Are they consistent with existing literature? What are the implications of your findings?
+
+
+\subsection{Risk-Return Trade-off}
+
+
+\subsection{Regime Dependence}
+
+
+\subsection{Portfolio Characteristics}
+
+
+\section{Discussion}
+Summarize the main conclusions of your research. Reiterate the key insights and their importance.
+
+
+\subsection{Why did 1/N perform well?}
+
+
+\subsection{The risk parity puzzle}
+
+
+\subsection{Practical Implications}
+
+
+
+\subsection{Limitations}
+
+
+\section{Conclusion}
+
+
+
+\section{Declarations}
+Briefly describe the contribution of each author to the research and writing of the report. For example: "A.B. designed the research. C.D. collected the data. E.F. performed the analysis. All authors contributed to writing the report."
+
+
+
+Future work could include:
+\begin{itemize}
+    \item Exploring alternative methodologies or datasets.
+    \item Addressing limitations of the current study.
+    \item Expanding the research to a different market or asset class.
+\end{itemize}
+
 
 \begin{table}[bt!]
 \caption{Descriptive caption for your table.}\label{tab:example_table}
@@ -218,38 +334,11 @@ Group B & 0.00 & 0.00 & 0.00 \\
 Group C & 0.00 & 0.00 & 0.00 \\ 
 \bottomrule
 \end{tabular}
+
 \begin{tablenotes}
 \item Note: Explain any specific details about the data in the table.
 \end{tablenotes}
 \end{table}
-
-\subsection{Interpretation of Findings}
-Discuss what your results mean. How do they relate to your initial research question? Are they consistent with existing literature? What are the implications of your findings?
-
-\section{Conclusion and Future Work}
-
-Summarize the main conclusions of your research. Reiterate the key insights and their importance.
-
-Future work could include:
-\begin{itemize}
-    \item Exploring alternative methodologies or datasets.
-    \item Addressing limitations of the current study.
-    \item Expanding the research to a different market or asset class.
-\end{itemize}
-
-\section{Declarations}
-
-\subsection{Author Contributions}
-Briefly describe the contribution of each author to the research and writing of the report. For example: "A.B. designed the research. C.D. collected the data. E.F. performed the analysis. All authors contributed to writing the report."
-
-\subsection{Competing Interests}
-The authors declare that they have no competing interests.
-
-\subsection{Funding}
-This research was conducted as part of the AP Capital Research initiative at the University of Surrey and received no external funding.
-
-\subsection{Acknowledgements}
-Thank anyone who provided help or support for the project, such as professors, mentors, or other colleagues.
 
 \bibliography{../refs/refs}
 
