@@ -3,6 +3,8 @@ import pandas as pd
 import numpy as np
 from typing import Callable
 
+from src.models.mvo import max_sharpe_weights, make_mvo_optimiser
+from src.models.risk_parity import compute_risk_parity_weights
 from src.models.black_litterman import (
     implied_equilibrium_returns,
     black_litterman_posterior,
@@ -71,13 +73,55 @@ class EqualWeightStrategy(BaseStrategy):
         weights = pd.Series(1.0 / n, index=available)
         return weights
 
+
+class MVOStrategy(BaseStrategy):
+
+    def __init__(
+        self,
+        tickers: list[str],
+        risk_free_rate: float | pd.Series = 0.04, # Default to 0.04 rf if series absent
+        cov_window: int = 252,
+    ):
+        self.tickers = list(tickers)
+        self.risk_free_rate = risk_free_rate
+        self.cov_window = cov_window
+
+    def get_target_weights(
+        self,
+        decision_date: pd.Timestamp,
+        past_prices: pd.DataFrame,
+        current_positions: pd.Series,
+        cash: float,
+    ) -> pd.Series:
+        
+        prices = past_prices[self.tickers].dropna(how="all")
+
+        if len(prices) < self.cov_window:
+            return pd.Series(1.0 / len(self.tickers), index=self.tickers)
+        
+        window_prices = prices.iloc[-self.cov_window:]
+        returns = window_prices.pct_change().dropna()
+
+        mu = returns.mean().to_numpy(dtype=float) * 252
+        cov = returns.cov().to_numpy(dtype=float) * 252
+
+        if isinstance(self.risk_free_rate, pd.Series):
+            rf = float(self.risk_free_rate.asof(decision_date)) # type: ignore
+        else:
+            rf = self.risk_free_rate
+
+        weights = max_sharpe_weights(mu, cov, rf)
+
+        return pd.Series(weights, index=self.tickers)
+
+
 class BlackLittermanStrategy(BaseStrategy):
     """
     Black-Litterman strategy:
     - Uses market weights as the prior (equilibrium) portfolio.
     - Builds views from a user-supplied view_builder callable.
     - Computes posterior expected returns via Black-Litterman.
-    - Calls an optimizer (e.g. mean-variance) to get final weights.
+    - Calls an optimiser (e.g. mean-variance) to get final weights.
     """
 
     def __init__(
@@ -86,9 +130,9 @@ class BlackLittermanStrategy(BaseStrategy):
         risk_aversion: float,
         tau: float,
         view_builder: Callable[
-            [pd.DataFrame, pd.Timestamp], tuple[np.ndarray, np.ndarray]
+            [pd.DataFrame, pd.Timestamp], tuple[np.ndarray, np.ndarray, np.ndarray]
         ],
-        optimizer: Callable[[pd.Series, pd.DataFrame], pd.Series],
+        optimiser: Callable[[pd.Series, pd.DataFrame, pd.Timestamp], pd.Series],
         view_uncertainty_scalar: float = 0.5,
         cov_window: int = 252,
     ):
@@ -104,9 +148,9 @@ class BlackLittermanStrategy(BaseStrategy):
         view_builder : callable
             Function (past_prices, decision_date) -> (P, Q),
             where P is (n_views x n_assets), Q is (n_views,).
-        optimizer : callable
+        optimiser : callable
             Function (mu, cov) -> target weights (pd.Series, sum = 1).
-            Typically your MVO optimizer.
+            Typically your MVO optimiser.
         view_uncertainty_scalar : float
             Scales the diagonal Omega (view uncertainty).
         cov_window : int
@@ -116,7 +160,7 @@ class BlackLittermanStrategy(BaseStrategy):
         self.risk_aversion = risk_aversion
         self.tau = tau
         self.view_builder = view_builder
-        self.optimizer = optimizer
+        self.optimiser = optimiser
         self.view_uncertainty_scalar = view_uncertainty_scalar
         self.cov_window = cov_window
         self.tickers = list(market_weights.index)
@@ -136,7 +180,7 @@ class BlackLittermanStrategy(BaseStrategy):
 
         window_prices = past_prices.iloc[-self.cov_window :]
         returns = window_prices.pct_change().dropna()
-        cov = returns.cov()
+        cov = returns.cov() * 252
 
         # Equilibrium returns
         mu_prior = implied_equilibrium_returns(
@@ -146,13 +190,11 @@ class BlackLittermanStrategy(BaseStrategy):
         )
 
         # Past data up to decision_date
-        P, Q = self.view_builder(window_prices, decision_date)
-
+        # We add Omega here so it can catch all three values from your FFT builder
+        P, Q, Omega = self.view_builder(window_prices, decision_date)
+        
         if P.size == 0:
-            # No views: just use prior + MVO
-            # replace return with weights.reindex(self.tickers).fillna(0.0) when MVO done
-            # weights = self.optimizer(mu_prior, cov)
-            return self.market_weights.copy()
+            return self.optimiser(mu_prior, cov, decision_date)
 
         Omega = build_diagonal_omega(Q, self.view_uncertainty_scalar)
 
@@ -165,9 +207,38 @@ class BlackLittermanStrategy(BaseStrategy):
             tau=self.tau,
         )
 
-        weights = self.optimizer(mu_bl, cov)
+        weights = self.optimiser(mu_bl, cov, decision_date)
         weights = weights.reindex(self.tickers).fillna(0.0)
         if weights.sum() != 0:
             weights = weights / weights.sum()
 
         return weights
+
+class RiskParityStrategy(BaseStrategy):
+    def __init__(self, tickers: list[str], cov_window: int = 252):
+        self.tickers = list(tickers)
+        self.cov_window = cov_window
+
+    def get_target_weights(
+            self,
+            decision_date: pd.Timestamp,
+            past_prices: pd.DataFrame,
+            current_positions: pd.Series,
+            cash: float
+        ) -> pd.Series:
+        
+        prices = past_prices[self.tickers].dropna(how="all")
+
+        if len(prices) < self.cov_window:
+            # fall back to market weights
+            return pd.Series(1.0 / len(self.tickers), index=self.tickers)
+        
+        recent_prices = prices.iloc[-self.cov_window:]
+        returns = recent_prices.pct_change().dropna()
+
+        cov = returns.cov().values
+
+        weights = compute_risk_parity_weights(cov)
+
+        return pd.Series(weights, index=self.tickers)
+

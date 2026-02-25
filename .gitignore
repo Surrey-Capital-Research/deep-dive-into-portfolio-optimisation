@@ -9,6 +9,7 @@ poetry.lock
 # Plans
 planning/
 
+*.pdf
 # LaTeX auxiliary files
 *.aux
 *.bbl

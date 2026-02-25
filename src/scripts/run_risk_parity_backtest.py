@@ -1,10 +1,10 @@
 import pandas as pd
 from src.backtesting.backtester import Backtester, BacktestResult
-from src.backtesting.strategies import EqualWeightStrategy
+from src.backtesting.strategies import RiskParityStrategy
 
 
 def run(prices: pd.DataFrame, rfr: pd.Series | None = None) -> BacktestResult:
-    strategy = EqualWeightStrategy(tickers=prices.columns) # type: ignore
+    strategy = RiskParityStrategy(tickers=prices.columns.tolist(), cov_window=252)
     return Backtester(prices=prices, strategy=strategy).run()
 
 

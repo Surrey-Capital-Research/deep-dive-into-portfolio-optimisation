@@ -21,6 +21,10 @@ def load_and_prepare_csv(path: str) -> pd.DataFrame:
     df.iloc[:, 0] = pd.to_datetime(df.iloc[:, 0])
     df = df.rename(columns={df.columns[0]: "Date"})
     ticker = os.path.splitext(os.path.basename(path))[0]
+
+    if ticker == "^v30082.L":
+        ticker = "UK_10Y-Yield"
+
     close_series = df["Close"]
 
     df_out = pd.DataFrame(
@@ -64,7 +68,7 @@ def main():
     print("DEBUG merged index min/max:", merged.index.min(), merged.index.max())
     print("DEBUG merged shape before date filter:", merged.shape)
     start = pd.Timestamp("2015-01-01")
-    end = pd.Timestamp("2025-01-01")
+    end = pd.Timestamp("2026-01-01")
     merged = merged[(merged.index >= start) & (merged.index <= end)]
     print("DEBUG merged shape after date filter:", merged.shape)
     merged = merged.dropna(how="all")
