@@ -106,7 +106,7 @@ class MVOStrategy(BaseStrategy):
         cov = returns.cov().to_numpy(dtype=float) * 252
 
         if isinstance(self.risk_free_rate, pd.Series):
-            rf = float(self.risk_free_rate.asof(decision_date).item()) # type: ignore
+            rf = float(self.risk_free_rate.asof(decision_date)) # type: ignore
         else:
             rf = self.risk_free_rate
 
@@ -130,7 +130,7 @@ class BlackLittermanStrategy(BaseStrategy):
         risk_aversion: float,
         tau: float,
         view_builder: Callable[
-            [pd.DataFrame, pd.Timestamp], tuple[np.ndarray, np.ndarray]
+            [pd.DataFrame, pd.Timestamp], tuple[np.ndarray, np.ndarray, np.ndarray]
         ],
         optimiser: Callable[[pd.Series, pd.DataFrame, pd.Timestamp], pd.Series],
         view_uncertainty_scalar: float = 0.5,
@@ -180,7 +180,7 @@ class BlackLittermanStrategy(BaseStrategy):
 
         window_prices = past_prices.iloc[-self.cov_window :]
         returns = window_prices.pct_change().dropna()
-        cov = returns.cov()
+        cov = returns.cov() * 252
 
         # Equilibrium returns
         mu_prior = implied_equilibrium_returns(
@@ -229,7 +229,7 @@ class RiskParityStrategy(BaseStrategy):
         
         prices = past_prices[self.tickers].dropna(how="all")
 
-        if past_prices.shape[0] < self.cov_window:
+        if len(prices) < self.cov_window:
             # fall back to market weights
             return pd.Series(1.0 / len(self.tickers), index=self.tickers)
         

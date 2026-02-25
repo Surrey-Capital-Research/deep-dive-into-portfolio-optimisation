@@ -2,7 +2,7 @@ import pandas as pd
 from src.backtesting.backtester import Backtester                                                                                
 from src.backtesting.strategies import RiskParityStrategy                                                                        
                                                                                                                                 
-# Load your price data                                                                                                           
+# Load price data                                                                                                           
 prices = pd.read_csv(                                                                                                            
     "data/uk_multi_asset_prices_clean.csv",                                                                                      
     index_col=0,                                                                                                                 
