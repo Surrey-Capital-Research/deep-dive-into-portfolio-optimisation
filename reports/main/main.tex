@@ -103,7 +103,6 @@ between the theoretical elegance of optimisation and its empirical fragility mot
     and the 2022 rate-hiking cycle?
 \end{enumerate}
 
-\subsection{Summary of Findings}
 \subsection{Structure of the Report}
 \indent \indent The remainder of this report is organised as follows: \newline
 Section 2 reviews the theoretical foundations of each model 
@@ -125,13 +124,13 @@ took to clean, process, or transform it. Mention the time period and frequency o
 
 \subsection{The Equal Weight Puzzle}
 
-The equal-weight (1/N) portfolio assigns an identical weight of 1/N to each asset in the portfolio, holding N assets, regardless of any asset-specific 
+\indent \indent The equal-weight (1/N) portfolio assigns an identical weight of 1/N to each asset in the portfolio, holding N assets, regardless of any asset-specific 
 characteristics such as return, volatility, or correlation. 
 \citet{demiguel_optimal_2009} tested 14 optimisation models across 7 datasets. None consistently outperformed the naive equal-weight portfolio: 
 \[
   w_i = \frac{1}{N} \quad \text{for} \quad 1 \leq i \leq N
 \]
-But why? When expected returns are estimated from historical data in order to determine optimal portfolio weights, the estimates 
+\indent But why? When expected returns are estimated from historical data in order to determine optimal portfolio weights, the estimates 
 improve as more data is collected, but they do so slowly. \newline
 Formally, the estimation error decays as
 \[
@@ -153,9 +152,9 @@ no attempt to diversify risk efficiently and cannot adapt to changing market con
 % ─────────────────────────────────────────────
 \subsection{Mean-Variance Optimisation}
 
-\citet{markowitz_portfolio_1952} formulated \textit{Portfolio Selection} as a constrained optimisation problem: minimise 
-portfolio variance for a given level of expected return.\newline
-Formally:
+\indent \indent \citet{markowitz_portfolio_1952} formulated \textit{Portfolio Selection} in 1952 as a constrained optimisation problem: minimise 
+portfolio variance for a given level of expected return. His work stands as a hallmark of modern portfolio theory.\newline
+\indent Formally, the problem states:
 \[                                                   
   \begin{aligned}
   \min_{\mathbf{w}} \hat{\sigma} =
@@ -239,21 +238,31 @@ The \emph{maximum Sharpe ratio} portfolio is:
     = \frac{\boldsymbol{\Sigma}^{-1}(\boldsymbol{\mu} - r_f \mathbf{1})}
            {\mathbf{1}^\top \boldsymbol{\Sigma}^{-1}(\boldsymbol{\mu} - r_f \mathbf{1})}
 \]
-Despite its theoretical elegance, Markowitz optimisation suffers from a well-documented problem. 
+\indent Despite its theoretical elegance, Markowitz optimisation suffers from a well-documented problem. 
 As mentioned above, the solution depends critically on $\boldsymbol{\mu}$ and $\boldsymbol{\Sigma}$, both estimated from historical data. \newline
 \indent Small errors in $\mathbf{\mu}$ can cause large shifts in optimal weights.
 \citet{michaud_markowitz_1989} characterised the optimiser as an "error maximiser": it systematically overweights assets with 
 overestimated returns and underestimated variances.
-\paragraph{The problem in practice.} Despite its theoretical elegance, Markowitz optimisation suffers from a well-documented problem. As mentioned above, the solution depends critically on $\boldsymbol{\mu}$ and $\boldsymbol{\Sigma}$, both estimated from historical data. Small errors in $\boldsymbol{\mu}$ can cause large shifts in optimal weights. \citet{Michaud 1989} characterised the optimiser as an ``error maximiser'': it systematically overweights assets with overestimated returns and underestimated variances.
-
 
 % ─────────────────────────────────────────────
-\subsubsection{Black–Litterman Model}
+\subsection{Black-Litterman and its Bayesian approach}
 
-\paragraph{Origins} The Black-Litterman (BL) model was developed by Fischer Black and Robert Litterman at Goldman Sachs in the early 1990s \citep{Black1990, Black1992} to address the instability of Mean-Variance Optimisation.
+\indent \indent The Black-Litterman (BL) model was developed by Fischer Black and 
+Robert Litterman at Goldman Sachs in the early 1990s \citep{black_asset_1991, black_global_1992} 
+to address the instability of Mean-Variance Optimisation.
 
-\paragraph{Key insight.} The BL model addresses two shortcomings of classical optimisation. First, what should the expected returns be when the investor has no particular view (a quantified belief about the future return of an asset or spread)? Rather than relying on noisy historical data, BL uses returns implied by current market-capitalisation weights as the natural neutral starting point. Second, how should an investor's views be incorporated in a consistent and controlled way? BL offers a formal Bayesian framework for blending subjective views with this equilibrium prior, weighting each by its precision.
-The equilibrium prior anchors the portfolio near market weights, ensuring diversification even in the absence of views. When views are expressed, the portfolio tilts away from equilibrium only as far as the investor's confidence warrants. The investor retains full control over the scope, direction, and confidence of each view, making the construction process transparent.
+\indent The BL model addresses two shortcomings of classical optimisation. First, 
+what should the expected returns be when the investor has no particular view? 
+Rather than relying on noisy historical data, BL uses returns implied by current 
+market-capitalisation weights as the natural neutral starting point. 
+Second, how should an investor's views be incorporated in a consistent and 
+controlled way? BL offers a formal Bayesian framework for blending subjective 
+views with this equilibrium prior, weighting each by its precision.
+The equilibrium prior anchors the portfolio near market weights, ensuring 
+diversification even in the absence of views. When views are expressed, the 
+portfolio tilts away from equilibrium only as far as the investor's confidence 
+warrants. The investor retains full control over the scope, direction, and 
+confidence of each view, making the construction process transparent.
 
 \paragraph{Step 1: Equilibrium Returns}
 
@@ -327,7 +336,6 @@ The posterior mean $\boldsymbol{\mu}_{\text{BL}}$ is used in place of the sample
 Because $\boldsymbol{\mu}_{\text{BL}}$ blends market equilibrium with the investor's views, the resulting portfolio $\mathbf{w}_{\text{BL}}$ only moves away from market weights when the investor has strong, meaningful views. In areas where views are weak or uncertain, the portfolio stays close to the market and remains broadly diversified.
 
 
-\subsection{Black-Litterman and its Bayesian approach}
 If you are testing a strategy, describe the backtesting framework. Mention key parameters like rebalancing 
 frequency, transaction cost assumptions, and performance metrics used.
 
