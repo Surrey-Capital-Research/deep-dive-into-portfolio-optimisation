@@ -65,7 +65,7 @@ class Backtester:
         # First trading day is included to invest immediately
         rebalance_dates = freq_ends.union([all_dates[0]])
 
-        return rebalance_dates
+        return pd.DatetimeIndex(rebalance_dates)
 
     def run(self) -> BacktestResult:
         dates = self.prices.index
@@ -161,9 +161,16 @@ class Backtester:
         n_days = rets.shape[0]
         annual_factor = 252.0
 
+        var_95 = float(np.percentile(rets, 5))
+        cvar_95 = float(rets[rets <= var_95].mean())
+
         cagr = (equity_curve.iloc[-1] / equity_curve.iloc[0]) ** (
             annual_factor / n_days
         ) - 1.0
+
+        downside = rets[rets < 0]
+        downside_vol = downside.std() * np.sqrt(252)
+        sortino = cagr / downside_vol if downside_vol > 0 else np.nan
 
         vol = rets.std() * np.sqrt(annual_factor)
         sharpe = cagr / vol if vol > 0 else np.nan
@@ -177,5 +184,8 @@ class Backtester:
             "CAGR": float(cagr),
             "volatility": float(vol),
             "Sharpe": float(sharpe),
+            "Sortino": float(sortino),
             "max_drawdown": float(max_dd),
+            "95% VaR": float(var_95),
+            "95% CVaR": float(cvar_95),
         }
