@@ -369,6 +369,9 @@ substituting $\boldsymbol{\mu}_{\text{BL}}$ in place of the sample mean $\boldsy
 \section{Methodology}
 
 \subsection{Data}
+The dataset contains daily adjusted closing prices for an 18-asset universe over a 10-year period, spanning from January 1st 2015, to December 31st 2025. The universe is made to reflect a representative UK-centric multi-asset portfolio. It consists of 15 large-cap equities across various sectors, which include Financials, Energy, and healthcare, as well as three diversifying exchange-traded products: UK Government Gilts (IGLT.L), Gold (SGLD.L), and an extensive Commodities basket (WCOG.L). All of this pricing data is programmatically sourced via Yahoo Finance.
+
+Standard closing prices were not chosen, instead adjusted closing prices were explicitly used because they account for corporate actions such as stock splits, rights issues, and dividend distributions. This is a crucial prerequisite for calculating precise, time-additive daily log returns. Moreover, the use of raw prices would artificially distort the return metrics during dividend ex-dates, so adjusted prices are used since they accurately reflect the true total return an investor would capture over a decade-long horizon encompassing multiple macroeconomic regimes.
 
 \subsection{Model Implementation}
 
