@@ -1,3 +1,4 @@
+% !TeX root = main.tex
 \documentclass[a4paper,num-refs]{scr-contemporary}
 
 \usepackage{xcolor}
@@ -8,8 +9,10 @@
 \usepackage{caption}
 \captionsetup{justification=centering}
 \let\mathscr\undefined
+
 \usepackage{newpxmath}
 \usepackage{ragged2e}
+\usepackage{booktabs}
 
 % Surrey Capital Research Specifics
 \jname{Surrey Capital Research} % Set the journal name to Surrey Capital Research
@@ -280,7 +283,7 @@ to address the instability of Mean-Variance Optimisation.
 
 \noindent \emph{Step 1. Equilibrium Returns} \\
 \indent The model takes as its starting point the equilibrium expected returns implied 
-by othe market portfolio, i.e. the portfolio where each asset is held in proportion
+by the market portfolio, i.e. the portfolio where each asset is held in proportion
 to its market capitalisation.
 Assuming the market portfolio is mean-variance efficient, the equilibrium excess returns are:
 \begin{equation}
@@ -371,11 +374,16 @@ substituting $\boldsymbol{\mu}_{\text{BL}}$ in place of the sample mean $\boldsy
 \subsection{Data}
 The dataset contains daily adjusted closing prices for an 18-asset universe over a 10-year period, spanning from January 1st 2015, to December 31st 2025. The universe is made to reflect a representative UK-centric multi-asset portfolio. It consists of 15 large-cap equities across various sectors, which include Financials, Energy, and healthcare, as well as three diversifying exchange-traded products: UK Government Gilts (IGLT.L), Gold (SGLD.L), and an extensive Commodities basket (WCOG.L). All of this pricing data is programmatically sourced via Yahoo Finance.
 
-Standard closing prices were not chosen, instead adjusted closing prices were explicitly used because they account for corporate actions such as stock splits, rights issues, and dividend distributions. This is a crucial prerequisite for calculating precise, time-additive daily log returns. Moreover, the use of raw prices would artificially distort the return metrics during dividend ex-dates, so adjusted prices are used since they accurately reflect the true total return an investor would capture over a decade-long horizon encompassing multiple macroeconomic regimes.
+Standard closing prices were not chosen, instead adjusted closing prices were explicitly used because they account for corporate actions such as stock splits, rights issues, and dividend distributions. This is a crucial prerequisite for calculating precise, time-additive daily log returns. Moreover, the use of raw prices would distort the return metrics during dividend ex-dates, so adjusted prices are used since they accurately reflect the true total return an investor would capture over a decade-long horizon encompassing multiple macroeconomic regimes.
 
 \subsection{Model Implementation}
+While Section~2 establishes the theoretical framework of portfolio optimisation, this section details the practical parameters imposed to translate these theories into feasible algorithmic strategies. Rather than relying on generic, pre-packaged optimisation libraries, the architecture utilises a custom Object-Oriented Programming paradigm built on \texttt{NumPy} and \texttt{Pandas}. An abstract base class (\texttt{BaseStrategy}) is defined to ensure modularity across models, utilising a rolling 252-trading-day estimation window to dynamically generate covariance ($\Sigma$) and expected return ($\mu$) inputs.
 
-% For BL
+To mitigate the ``error maximisation'' fragility highlighted in the literature review, our solvers mathematically enforce several structural constraints. In the case of Mean-Variance Optimisation (MVO), we derive the maximum Sharpe ratio portfolio via an iterative subspace method. Numerical stability and positive definiteness within highly correlated asset matrices are guaranteed by applying a Tikhonov regularisation penalty (a diagonal loading of $1 \times 10^{-8}$) to the covariance matrix. Concurrently, the algorithm strictly adheres to a long-only constraint ($w_i \geq 0$) by systematically pruning assets with negative target weights from the active matrix, re-solving iteratively until a strictly non-negative global optimum is achieved.
+
+Moving to the Risk Parity framework, the equal risk contribution portfolio requires a distinct numerical approach. Here, a custom Newton--Raphson iteration serves as the root-finding algorithm. By utilising an analytically derived Jacobian matrix initialised with an inverse-volatility guess, this method ensures both rapid and precise convergence. 
+
+The Black--Litterman model likewise requires a systematic methodology to generate its subjective views ($Q$). We construct a cross-sectional 252-day price momentum signal, directly motivated by the momentum effect documented by \citet{jegadeesh_returns_1993}. Because their research demonstrates that stocks with high returns over the prior 3 to 12 months continue to generate abnormal outperformance of approximately $1\%$ per month, this empirically grounded signal provides a robust foundation for our directional views. These historical return signals are subsequently blended with the implied equilibrium returns via Bayesian updating to yield the final posterior expected returns.
 % \indent The investor views incorporated in this study are motivated by the momentum effect documented by 
 % \citet{jegadeesh_returns_1993}. They show that stocks with high returns over the prior 3-12 
 % months continue to outperform stocks with low prior returns over the subsequent 3-12 months, 
@@ -384,7 +392,9 @@ Standard closing prices were not chosen, instead adjusted closing prices were ex
 % views within the Black-Litterman framework. 
 
 \subsection{Backtesting Framework}
-Backtester method
+The strategies are evaluated using a walk-forward backtesting engine to ensure zero look-ahead bias. At any given rebalancing date $t$, the optimiser relies strictly on the historical data available in the preceding 252-day window. A starting capital base of \pounds 100{,}000 is initialised in the portfolio and deployed immediately on the first available trading day. Thereafter, the portfolio undergoes rebalancing on the final trading day of each calendar month.
+
+Critically, the simulation relies on several foundational assumptions. We assume perfect asset divisibility, allowing the allocation of fractional shares to match exact target weights. In addition, we assume immediate execution at the end-of-day adjusted close price on the rebalancing date. To simulate real-world implementation frictions and measure the impact of portfolio turnover, a flat transaction cost of 5 basis points ($0.05\%$) is deducted per unit of traded value during each monthly rebalance. Any capital not allocated to the active asset matrix is held as an uninvested cash balance yielding $0\%$. Furthermore, the simulation does not explicitly model non-linear market impact or bid--ask spread expansion during liquidity crises. It is assumed that the 18 selected large-cap assets possess sufficient market depth to absorb the hypothetical order flow without inducing severe execution slippage.
 
 
 \subsection{Performance Metrics}
