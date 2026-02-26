@@ -247,12 +247,12 @@ $$
 
 ### 2.6 Model Summary
 
-| Model           | Requires$\mu$? | Requires$\Sigma$? | Key Weakness                 |
-| --------------- | ---------------- | ------------------- | ---------------------------- |
-| Equal Weight    | No               | No                  | Ignores all information      |
-| MVO             | Yes              | Yes                 | Estimation error in $\mu$ |
-| Black-Litterman | Partial (views)  | Yes                 | Depends on view quality      |
-| Risk Parity     | No               | Yes                 | Overweights low-vol assets   |
+| Model           | Requires$\mu$? | Requires$\Sigma$? | Key Weakness               |
+| --------------- | ---------------- | ------------------- | -------------------------- |
+| Equal Weight    | No               | No                  | Ignores all information    |
+| MVO             | Yes              | Yes                 | Estimation error in$\mu$ |
+| Black-Litterman | Partial (views)  | Yes                 | Depends on view quality    |
+| Risk Parity     | No               | Yes                 | Overweights low-vol assets |
 
 ---
 
@@ -344,9 +344,9 @@ Possibly more may be added
 
 ## 4. Results (2.5-3 pages)
 
-### 4.1 Main Result: Performance Comparison
+### 4.1 Full-Period Performance
 
-**Table 1:** Full-period performance (all 4 strategies, all metrics)
+**Table 1a:** Return and risk metrics (2015–2025)
 
 | Metric       | Equal Weight | MVO | Black-Litterman | Risk Parity |
 | ------------ | ------------ | --- | --------------- | ----------- |
@@ -355,49 +355,63 @@ Possibly more may be added
 | Volatility   | X%           | X%  | X%              | X%          |
 | Sharpe Ratio | X            | X   | X               | X           |
 | Max Drawdown | X%           | X%  | X%              | X%          |
-| Avg Turnover | X%           | X%  | X%              | X%          |
 
-**Figure 3:** Cumulative wealth curves (all strategies on same axes)
+**Table 1b:** Downside risk metrics (2015–2025)
+
+| Metric        | Equal Weight | MVO | Black-Litterman | Risk Parity |
+| ------------- | ------------ | --- | --------------- | ----------- |
+| Sortino Ratio | X            | X   | X               | X           |
+| VaR 95%       | X%           | X%  | X%              | X%          |
+| CVaR 95%      | X%           | X%  | X%              | X%          |
+
+**Figure 3:** Cumulative wealth curves (all four strategies on the same axes, £100k initial capital)
+
+**Figure 4:** Drawdown chart (all four strategies on the same axes)
 
 Key observations:
-
-- Which won? By how much?
-- What's surprising?
+- Which strategy won overall and by how much?
+- Does the ranking change on a risk-adjusted basis?
+- What does the drawdown chart reveal that the cumulative returns do not?
 
 ### 4.2 Risk-Return Trade-off
 
-**Figure 4:** Risk-return scatter or Sharpe ratio comparison
+**Figure 5:** Risk-return scatter (one dot per strategy, volatility on x-axis, CAGR on y-axis)
+
+**Figure 6:** Rolling 12-month Sharpe ratio (all four strategies, full sample period)
 
 Discussion:
-
-- Risk Parity: lowest vol, lowest return
-- MVO: [describe behaviour]
-- The efficiency frontier in practice
+- Where does each strategy sit relative to the others in risk-return space?
+- Does the rolling Sharpe suggest any strategy is consistently superior, or do rankings shift over time?
+- How does MVO's instability manifest in the rolling Sharpe?
 
 ### 4.3 Regime Dependence
 
-**Table 2:** Performance by regime
+**Table 2:** Cumulative return by regime
 
 | Period        | Event      | EW | MVO | BL | RP |
 | ------------- | ---------- | -- | --- | -- | -- |
-| Jun–Dec 2016 | Brexit     | X% | X%  | X% | X% |
-| Feb–Mar 2020 | COVID      | X% | X%  | X% | X% |
-| Jan–Dec 2022 | Rate Hikes | X% | X%  | X% | X% |
+| Jun–Dec 2016  | Brexit     | 15.95% | 0.84%  | 20.28% | 6.16% |
+| Feb–Mar 2020  | COVID      | -25.84% | 3.59%  | -13.44%% | -13.69% |
+| Jan–Dec 2022  | Rate Hikes | 1.5% | X-6.02  | -10.9% | -4.34% |
 
-**Figure 5:** 2022 Crisis Deep Dive
+**Figure 7:** Three-panel cumulative return chart, one subplot per regime (Brexit, COVID, 2022)
 
-Key insight: Risk Parity's bond overweight was a liability when bonds and equities fell together (correlation breakdown).
+Discussion:
+- Which model was most resilient during market stress?
+- Brexit: currency shock, sector rotation — who benefited?
+- COVID: sharp drawdown and recovery — who recovered fastest?
+- 2022: equity-bond correlation breakdown — why did Risk Parity suffer most?
 
 ### 4.4 Portfolio Characteristics
 
-**Figure 6:** Average allocation by asset class (stacked bar chart)
+**Figure 8:** Allocation heatmaps for MVO, Black-Litterman, and Risk Parity (assets on y-axis, time on x-axis) — Equal Weight omitted as trivially flat
 
-**Figure 7:** Risk Parity allocation over time (heatmap)
+**Figure 9:** Turnover bar chart (average monthly turnover for all four strategies)
 
 Discussion:
-
-- How stable are allocations?
-- Turnover comparison
+- How stable are allocations over time for each model?
+- MVO expected to show highest turnover — does this hold?
+- What is the cost of complexity implied by turnover?
 
 ---
 

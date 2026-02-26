@@ -31,6 +31,8 @@
 \jnumber{01}
 \jyear{2026}
 
+\numberwithin{equation}{section}
+
 \begin{document}
 
 \begin{frontmatter}
@@ -90,7 +92,7 @@ suggesting that estimation error dominates theoretical optimality for typical po
 between the theoretical elegance of optimisation and its empirical fragility motivates the present study. 
 
 
-\subsection{Background and Research Objectives}
+\subsection{Research Objectives}
 \indent \indent This study addresses three main questions:
 \begin{enumerate}
     \item Do optimisation models outperform a naive 1/N benchmark
@@ -127,15 +129,15 @@ took to clean, process, or transform it. Mention the time period and frequency o
 \indent \indent The equal-weight (1/N) portfolio assigns an identical weight of 1/N to each asset in the portfolio, holding N assets, regardless of any asset-specific 
 characteristics such as return, volatility, or correlation. 
 \citet{demiguel_optimal_2009} tested 14 optimisation models across 7 datasets. None consistently outperformed the naive equal-weight portfolio: 
-\[
+\begin{equation}
   w_i = \frac{1}{N} \quad \text{for} \quad 1 \leq i \leq N
-\]
+\end{equation}
 \indent But why? When expected returns are estimated from historical data in order to determine optimal portfolio weights, the estimates 
 improve as more data is collected, but they do so slowly. \newline
 Formally, the estimation error decays as
-\[
+\begin{equation}
   \hat{\mu} - \mu = \mathcal{O}\!\left(\frac{1}{\sqrt{T}}\right)
-\]
+\end{equation}
 where $T$ is the number of observations.
 
 Because the error shrinks at rate $\frac{1}{\sqrt{T}}$, halving the 
@@ -151,11 +153,12 @@ no attempt to diversify risk efficiently and cannot adapt to changing market con
 
 % ─────────────────────────────────────────────
 \subsection{Mean-Variance Optimisation}
+\label{sec:mvo}
 
 \indent \indent \citet{markowitz_portfolio_1952} formulated \textit{Portfolio Selection} in 1952 as a constrained optimisation problem: minimise 
 portfolio variance for a given level of expected return. His work stands as a hallmark of modern portfolio theory.\newline
 \indent Formally, the problem states:
-\[                                                   
+\begin{equation}                                         
   \begin{aligned}
   \min_{\mathbf{w}} \hat{\sigma} =
   \mathbf{w}^\top \hat{\boldsymbol{\Sigma}}\ \mathbf{w}
@@ -164,12 +167,12 @@ portfolio variance for a given level of expected return. His work stands as a ha
   \quad \text{;} \quad 
   \mathbf{w}^\top\mathbf{1} = 1
   \end{aligned}
-\]
+\end{equation}
 
 with
   $\quad \quad \mathbf{w}, \boldsymbol{\mu} \in \mathbb{R}^N 
   \quad \text{and} \quad
-  \hat{\boldsymbol{\Sigma}} \in \mathbb{R}^{N \times  N} \quad \quad$ 
+  \hat{\boldsymbol{\Sigma}} \in \mathbb{R}^{N \times N} \quad \quad$ 
 as the vector of portfolio weights, the vector of expected returns with
 $\mu_p$ as the scalar target portfolio return and the sample covariance 
 matrix of asset returns estimated from historical data respectively. \\
@@ -186,7 +189,7 @@ Practically speaking, a negative weight corresponds to a short position in the a
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.45\textwidth]{../images/plots/efficient_frontier.pdf}
+    \includegraphics[width=0.45\textwidth]{../images/plots/theory/efficient_frontier.pdf}
     \caption{Efficient Frontier estimated using sample covariance}
     \label{fig:efficient_frontier}
 \end{figure}
@@ -195,54 +198,66 @@ Because the objective function is quadratic and the constraints are linear equal
 (two constraints, n unknowns). We therefore use the method of Lagrange multipliers. 
 The Lagrangian formulation is:
 
-\[
+\begin{equation}
   \mathcal{L}(\mathbf{w}, \lambda, \gamma)
       = \mathbf{w}^\top \boldsymbol{\Sigma} \mathbf{w}
       - \lambda\!\left(\mathbf{w}^\top \boldsymbol{\mu} - \mu_p\right)
       - \gamma\!\left(\mathbf{1}^\top \mathbf{w} - 1\right)
-\]
+\end{equation}
 
 where $\lambda$ and $\gamma$ are the Lagrange multipliers associated with the return and budget constraints, respectively. 
 Intuitively, $\lambda$ captures the marginal cost of requiring a higher return (i.e. how much additional variance must be accepted 
 per unit increase in $\mu_p$), and $\gamma$ enforces full investment.
 
 Taking the first-order condition:
-\[
+\begin{equation}
   \frac{\partial \mathcal{L}}{\partial \mathbf{w}} = 2\boldsymbol{\Sigma} \mathbf{w} - \lambda \boldsymbol{\mu} - \gamma \mathbf{1} = \mathbf{0}
-\]
+\end{equation}
 
 Solving gives:
-\[
+\begin{equation}
   \mathbf{w}_p = \frac{\lambda}{2}\,\boldsymbol{\Sigma}^{-1}\boldsymbol{\mu} + \frac{\gamma}{2}\,\boldsymbol{\Sigma}^{-1}\mathbf{1}
-\]
+\end{equation}
 
 Imposing the budget and return constraints leads to the following two-fund theorem: all efficient portfolios can be expressed as a 
 linear combination of any two distinct efficient portfolios.
-\[
+\begin{equation}
   \mathbf{w}_A = \frac{\boldsymbol{\Sigma}^{-1}\mathbf{1}}{\mathbf{1}^\top \boldsymbol{\Sigma}^{-1}\mathbf{1}}
   \qquad
   \mathbf{w}_B = \frac{\boldsymbol{\Sigma}^{-1}\boldsymbol{\mu}}{\mathbf{1}^\top \boldsymbol{\Sigma}^{-1}\boldsymbol{\mu}}
-\]
+\end{equation}
 
 Note that $\mathbf{w}_A$ is the \emph{global minimum variance} (GMV) portfolio, 
 the leftmost point on the efficient frontier, obtained by dropping the 
 return constraint and minimising variance subject only to full investment:
-\[
+\begin{equation}
   \mathbf{w}_{\mathrm{GMV}}
     = \frac{\boldsymbol{\Sigma}^{-1}\mathbf{1}}{\mathbf{1}^\top \boldsymbol{\Sigma}^{-1}\mathbf{1}}
-\]
+\end{equation}
 
-The \emph{maximum Sharpe ratio} portfolio is:
-\[
+And the \emph{maximum Sharpe ratio} portfolio is:
+\begin{equation}
   \mathbf{w}_{\mathrm{MSR}}
     = \frac{\boldsymbol{\Sigma}^{-1}(\boldsymbol{\mu} - r_f \mathbf{1})}
            {\mathbf{1}^\top \boldsymbol{\Sigma}^{-1}(\boldsymbol{\mu} - r_f \mathbf{1})}
-\]
+  \label{eq:msr}
+\end{equation}
 \indent Despite its theoretical elegance, Markowitz optimisation suffers from a well-documented problem. 
 As mentioned above, the solution depends critically on $\boldsymbol{\mu}$ and $\boldsymbol{\Sigma}$, both estimated from historical data. \newline
 \indent Small errors in $\mathbf{\mu}$ can cause large shifts in optimal weights.
 \citet{michaud_markowitz_1989} characterised the optimiser as an "error maximiser": it systematically overweights assets with 
 overestimated returns and underestimated variances.
+
+\begin{keypoints*}
+\begin{itemize}
+  \item Black-Litterman uses market-cap weights as a neutral 
+  starting point for expected returns.
+  \item Subjective investor views are blended with the equilibrium
+  prior through a Bayesian update.
+  \item The optimisation step in Black-Litterman is the same as MVO
+  with $\boldsymbol{\mu}_{BL}$ replacing the sample mean.                                                    
+\end{itemize}
+\end{keypoints*}
 
 % ─────────────────────────────────────────────
 \subsection{Black-Litterman and its Bayesian approach}
@@ -251,93 +266,102 @@ overestimated returns and underestimated variances.
 Robert Litterman at Goldman Sachs in the early 1990s \citep{black_asset_1991, black_global_1992} 
 to address the instability of Mean-Variance Optimisation.
 
-\indent The BL model addresses two shortcomings of classical optimisation. First, 
-what should the expected returns be when the investor has no particular view? 
-Rather than relying on noisy historical data, BL uses returns implied by current 
-market-capitalisation weights as the natural neutral starting point. 
-Second, how should an investor's views be incorporated in a consistent and 
-controlled way? BL offers a formal Bayesian framework for blending subjective 
-views with this equilibrium prior, weighting each by its precision.
-The equilibrium prior anchors the portfolio near market weights, ensuring 
-diversification even in the absence of views. When views are expressed, the 
-portfolio tilts away from equilibrium only as far as the investor's confidence 
-warrants. The investor retains full control over the scope, direction, and 
-confidence of each view, making the construction process transparent.
+\indent The BL model addresses two shortcomings of classic mean-variance optimisation:
+\begin{enumerate}
+  \vspace{-2mm}
+  \item What expected returns should be used? \newline
+  Rather than relying on historical data, BL uses returns implied by current 
+  market-cap weights as the neutral starting point.
+  \item How should the views be incorporated? \newline
+  BL offers a formal Bayesian framework for blending subjective investor views 
+  with this equilibrium prior, weighting each source inversely by its uncertainty.
+  \vspace{-2mm}
+\end{enumerate}
 
-\paragraph{Step 1: Equilibrium Returns}
-
-The BL model takes as its starting point the equilibrium expected returns implied by observed market-capitalisation weights. Assuming the market portfolio is mean-variance efficient, the equilibrium excess returns are:
-\[
+\noindent \emph{Step 1. Equilibrium Returns} \\
+\indent The model takes as its starting point the equilibrium expected returns implied 
+by othe market portfolio, i.e. the portfolio where each asset is held in proportion
+to its market capitalisation.
+Assuming the market portfolio is mean-variance efficient, the equilibrium excess returns are:
+\begin{equation}
 \Pi = \delta \Sigma w_{m}
-\]
-where $w_m$ is the market-capitalisation weight vector, $\Sigma$ is the covariance matrix of asset returns and $\delta$ is the risk-aversion coefficient:
-\[
-  \delta = \frac{r_m - r_f}{\sigma_m^2}.
-\]
+\end{equation}
+where $w_m$ is the market-cap weight vector, $\Sigma$ is the covariance 
+matrix of asset returns and $\delta$ is the risk-aversion coefficient
+\begin{equation}
+  \delta = \frac{r_m - r_f}{\sigma_m^2}
+\end{equation}
+with $r_m$ the return of the market portfolio and $\sigma^2$ its variance. \\
 
-\paragraph{Step 2: Express Views}
-
-As mentioned above the BL model allows the investor to express views. A view can be absolute ("asset A will return 5\%") or relative ("asset A will outperform asset B by 2\%"). Each view has two components: the expected return itself, and a confidence level attached to it.
-Formally, K views are expressed through the system:
-\[
-  P\mu = Q + \varepsilon, \qquad \varepsilon \sim \mathcal{N}(\mathbf{0}, \Omega),
-\]
+\noindent \emph{Step 2. Express Views} \\
+\indent A view can be absolute or relative, for example "asset A will return 5\%" or 
+"asset A will outperform asset B by 2\%".
+Each view has two components: the expected return itself and a confidence 
+level attached to it. \newline
+\indent Formally, k views are expressed through the following system:
+\begin{equation}
+  P \boldsymbol{\mu} = \boldsymbol{Q} + \boldsymbol{\varepsilon}
+  \qquad \boldsymbol{\varepsilon} \sim \mathcal{N}(\mathbf{0}, \Omega)
+\end{equation}
 where
 \begin{itemize}
-  \item $P \in \mathbb{R}^{k \times n}$: the \emph{pick matrix} (which assets are involved),
-  \item $Q \in \mathbb{R}^k$: the expected view returns,
-  \item $\Omega \in \mathbb{R}^{k \times k}$: view uncertainty (diagonal),
-  \item $\varepsilon$ (error-term): the deviation of true returns from the stated views, assumed to be normally distributed with mean zero.
+  \item $P \in \mathbb{R}^{k \times n}$: the \emph{pick matrix} (which assets are involved)
+  \item $\boldsymbol{\mu} \in \mathbb{R}^k$ is the expected return
+  \item $\boldsymbol{Q} \in \mathbb{R}^k$: the expected view returns
+  \item $\Omega \in \mathbb{R}^{k \times k}$: view uncertainty (diagonal)
+  \item $\boldsymbol{\varepsilon}$ (error-term): the deviation of true returns from the stated views, 
+  assumed to be normally distributed with mean zero
 \end{itemize}
 
-The views incorporated in this study are motivated by the momentum effect documented by \cite{Jegadeesh1993}. They show that stocks with high returns over the prior 3--12 months continue to outperform stocks with low prior returns over the subsequent 3--12 months, generating abnormal returns of approximately 1\% per month. This persistent pattern offers an empirically grounded basis for constructing views within the BL framework.
-
-Assets are ranked by their return over the previous 12 months, excluding the most recent month to eliminate short-term reversal effects. The highest-return decile forms the winner portfolio, while the lowest-return decile constitutes the loser portfolio. The view is expressed as:
-
+\indent Assets are ranked by their return over the previous 12 months, excluding the most 
+recent month to eliminate short-term reversal effects. The highest-return tercile forms
+the winner portfolio, while the lowest-return decile constitutes the loser portfolio. \\
+\indent The view is expressed as:
 \begin{equation}
-    p_{k}^{\top}\mu = q_k
+    \boldsymbol{p}_{k}^{\top} \boldsymbol{\mu} = q_k
 \end{equation}
+$\boldsymbol{p}_k$ assigns equal positive weights to winner assets and equal negative weights 
+to loser assets, forming a long-short momentum view. The expected return 
+spread $q_k$ is estimated over a rolling window at each rebalancing date as asset rankings change.
 
-$\mathbf{p}_k$ assigns equal positive weights to winner assets and equal negative weights to loser assets, forming a long--short, dollar-neutral momentum view. The expected return spread $q_k$ is calibrated to the momentum premium documented by \cite{Jegadeesh1993} or estimated over a rolling window. Views are updated at each rebalancing date as rankings change.
-
-The Lagrangian formulation yields an unconstrained solution that permits short-selling (negative weights). This study focuses exclusively on long trades: only views with positive expected returns ($q_k > 0$) are retained, and portfolio weights are constrained to $w_i \geq 0$ at the optimisation stage.
-
-
-\paragraph{Step 3: Bayesian Update}
-
-The prior on expected returns is:
-
+\noindent \emph{Step 3. Bayesian Update} \\
+\indent The prior on expected returns is:
 \begin{equation}
-    \mu \sim \mathcal{N}(\Pi, \tau \Sigma)
+    \boldsymbol{\mu} \sim \mathcal{N}(\boldsymbol{\Pi}, \tau \boldsymbol{\Sigma})
 \end{equation}
-
-This encodes the belief that expected returns are centred on the equilibrium vector $\boldsymbol{\pi}$, with uncertainty scaled by $\tau$. Combining this prior with the view system via Bayes' theorem yields the posterior distribution over expected returns:
-
+This encodes the belief that expected returns are centred on the equilibrium 
+vector $\boldsymbol{\Pi}$, with uncertainty scaled by $\tau$. Combining this prior 
+with the view system via Bayes' theorem yields the posterior distribution over 
+expected returns:
 \begin{equation}
-   \mu \mid Q \sim \mathcal{N}(\mu_{\mathrm{BL}}, \Sigma_{\mathrm{BL}})
+    \boldsymbol{\mu} \mid \boldsymbol{Q} \sim \mathcal{N}(\boldsymbol{\mu_{BL}}, \boldsymbol{\Sigma_{BL}})
 \end{equation}
-
 where the posterior mean is:
-
 \begin{equation}
-    \mu_{\mathrm{BL}} = \left[(\tau \Sigma)^{-1} + P^{\top}\Omega^{-1}P\right]^{-1}\left[(\tau \Sigma)^{-1}\Pi + P^{\top}\Omega^{-1}Q\right]
+    \boldsymbol{\mu_{BL}} = 
+    \left[(\tau \Sigma)^{-1} 
+    + P^{\top}\Omega^{-1}P\right]^{-1}\left[(\tau \Sigma)^{-1}\boldsymbol{\Pi} 
+    + P^{\top}\Omega^{-1}\boldsymbol{Q}\right]
 \end{equation}
+The posterior mean $\boldsymbol{\mu}_{BL}$ is a precision-weighted average of the 
+equilibrium prior $\boldsymbol{\Pi}$ and the investor's views $\boldsymbol{Q}$, with each 
+source weighted inversely by its uncertainty. 
+When views are diffuse (large $\boldsymbol{\Omega}$), $\boldsymbol{\mu}_{BL}$ 
+remains close to $\boldsymbol{\Pi}$. 
+If the views are held with high confidence (small $\boldsymbol{\Omega}$), 
+$\boldsymbol{\mu}_{BL}$ tilts toward $\mathbf{Q}$. \newline
 
-The posterior mean $\boldsymbol{\mu}_{\text{BL}}$ is a precision-weighted average of the equilibrium prior $\boldsymbol{\Pi}$ and the investor's views $\mathbf{Q}$, with each source weighted inversely by its uncertainty. When views are diffuse (large $\boldsymbol{\Omega}$), $\boldsymbol{\mu}_{\text{BL}}$ remains close to $\boldsymbol{\Pi}$ and the portfolio stays near market weights. If the views are held with high confidence (small $\boldsymbol{\Omega}$), $\boldsymbol{\mu}_{\text{BL}}$ tilts toward $\mathbf{Q}$. This blending property is central to the appeal of the BL framework: the investor's views are incorporated gradually and in proportion to their confidence, rather than overriding the prior entirely.
+This blending property is central to the appeal of the BL framework: 
+Rather than overriding the equilibrium prior, views are incorporated gradually 
+and in proportion to their confidence. This acts as a natural regulariser, because the 
+prior pulls weights toward the market portfolio, the model is far less prone to the 
+concentrated, unstable allocations that plague classical MVO. \\
 
-\paragraph{Step 4: Portfolio Optimisation}
+\noindent \emph{Step 4. Portfolio Optimisation} \\
+\indent The optimal portfolio is obtained by applying the same Sharpe-maximising 
+objective derived in Section~\ref{sec:mvo} (equation~\ref{eq:msr}), 
+substituting $\boldsymbol{\mu}_{\text{BL}}$ in place of the sample mean $\boldsymbol{\mu}$.
 
-The posterior mean $\boldsymbol{\mu}_{\text{BL}}$ is used in place of the sample mean in the mean–variance optimisation. The optimal portfolio is obtained by maximising the Sharpe ratio over the feasible set $\mathcal{W}$:
-
-\begin{equation}
-    \mathbf{w}_{\text{BL}} = \arg\max_{\mathbf{w} \in \mathcal{W}} \; \frac{\mathbf{w}^{\top}\boldsymbol{\mu}_{\text{BL}} - r_f}{\sqrt{\mathbf{w}^{\top}\boldsymbol{\Sigma}\,\mathbf{w}}}
-\end{equation}
-
-Because $\boldsymbol{\mu}_{\text{BL}}$ blends market equilibrium with the investor's views, the resulting portfolio $\mathbf{w}_{\text{BL}}$ only moves away from market weights when the investor has strong, meaningful views. In areas where views are weak or uncertain, the portfolio stays close to the market and remains broadly diversified.
-
-
-If you are testing a strategy, describe the backtesting framework. Mention key parameters like rebalancing 
-frequency, transaction cost assumptions, and performance metrics used.
 
 \subsection{Dalio's Risk Parity}
 
@@ -348,6 +372,13 @@ frequency, transaction cost assumptions, and performance metrics used.
 
 \subsection{Model Implementation}
 
+% For BL
+% \indent The investor views incorporated in this study are motivated by the momentum effect documented by 
+% \citet{jegadeesh_returns_1993}. They show that stocks with high returns over the prior 3-12 
+% months continue to outperform stocks with low prior returns over the subsequent 3-12 months, 
+% generating abnormal returns of approximately 1\% per month.
+% This persistent pattern offers an empirically grounded basis for constructing 
+% views within the Black-Litterman framework. 
 
 \subsection{Backtesting Framework}
 Backtester method

@@ -3,6 +3,7 @@ Illustrative efficient frontier for the theory section.
 Uses synthetic assets so the curve is clean and textbook-shaped.
 Run from project root: poetry run python src/visualizations/plot_efficient_frontier.py
 """
+import os
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
@@ -20,7 +21,7 @@ COV = np.array([
 ])
 
 RF   = 0.01
-SAVE = "reports/images/plots/efficient_frontier"
+SAVE = "reports/images/plots/theory/efficient_frontier"
 
 
 def _frontier(mu, cov, n_points=400):
@@ -60,6 +61,7 @@ def _max_sharpe(mu, cov, rf):
 
 
 def plot(save_path=SAVE):
+    os.makedirs(os.path.dirname(save_path), exist_ok=True)
     sigma_f, mu_f = _frontier(MU, COV)
 
     w_gmv     = _gmv(COV)
