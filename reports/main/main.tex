@@ -402,24 +402,197 @@ All metrics we're using
 (Return, Sharpe, Sortino, Volatility, CAGR, Max DD, VaR, CVaR)
 
 \section{Results}
-This section presents the key findings from your analyses and interprets their significance. Use figures and tables to 
-present your results clearly.
 
-Present your main results. This could be in the form of tables summarizing statistical outputs, or charts showing trends and relationships.
+The results section evaluates four portfolio optimisation strategies,  Equal Weight, Risk Parity, Mean-Variance Optimisation (MVO), and Black-Litterman, across the  2015 to 2025 period, using a starting portfolio value of £100,000. The analysis is organised across four subsections, covering full-period performance, risk-return trade-offs, regime dependence, and portfolio characteristics. 
+%% ─────────────────────────────────────────────
+\subsection{Full-Period Performance}
+
+Tables 1 and 2 present the return, risk, and downside risk metrics for all four strategies over the full sample period from 2015 to 2025, with Figure 3 showing the corresponding cumulative wealth curves and Figure 4 the drawdown profiles.
+
+\begin{table}[H]
+
+\centering
+\caption{Return and Risk Metrics (2015--2025)}
+\label{tab:returns_risk}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Metric} & \textbf{Equal Weight} & \textbf{Risk Parity} & \textbf{MVO} & \textbf{Black-Litterman} \\
+\midrule
+Total Return  & 91.57\%  & 27.34\%  & 23.56\%  & 22.17\%  \\
+CAGR          &  6.08\%  &  2.22\%  &  1.94\%  &  1.83\%  \\
+Volatility    & 13.94\%  &  9.39\%  & 10.31\%  & 12.03\%  \\
+Sharpe Ratio  &    0.44  &    0.24  &    0.19  &    0.15  \\
+Max Drawdown  & -29.68\% & -22.60\% & -22.60\% & -27.35\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Downside Risk Metrics (2015--2025)}
+\label{tab:downside_risk}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Metric} & \textbf{Equal Weight} & \textbf{Risk Parity} & \textbf{MVO} & \textbf{Black-Litterman} \\
+\midrule
+Sortino Ratio &  0.56   &  0.29   &  0.23   &  0.18   \\
+95\% VaR      & -1.28\% & -0.86\% & -0.95\% & -1.05\% \\
+95\% CVaR     & -2.09\% & -1.46\% & -1.63\% & -1.84\% \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 
-\subsection{Main Result: Performance Comparison}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{reports/images/plots/results/fig3_cummulative_wealth.pdf}
+    \caption{Cumulative wealth curves for all four strategies (2015--2025), indexed to \pounds100,000 initial capital.}
+    \label{fig:cumulative_wealth}
+\end{figure}
 
-Discuss what your results mean. How do they relate to your initial research question? Are they consistent with existing literature? What are the implications of your findings?
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{reports/images/plots/results/fig4_drawdown.pdf}
+    \caption{Drawdown profiles for all four strategies (2015--2025).}
+    \label{fig:drawdown}
+\end{figure}
+
+\subsubsection*{Which strategy won overall, and by how much?}
+On a raw return basis, Equal
+Weight was the clear winner, delivering a total return of 91.57\% (CAGR: 6.08\%) over the period. This result is more than three times the return of the next best strategy, Risk Parity (27.34\%, CAGR: 2.22\%). MVO and Black-Litterman lagged further still at 23.56\% and 22.17\% respectively. The cumulative return chart reinforces this: Equal Weight’s portfolio value surpassed £190k by late 2025, while the others clustered between £135k–£163k, with Risk Parity the weakest performer in absolute terms.
+
+\subsubsection*{Does the ranking change on a risk-adjusted basis?}
+The ranking is preserved but compressed. Equal Weight retains the top position with a Sharpe ratio of 0.44 and Sortino of 0.56, reflecting that its higher volatility (13.94\%) was more than compensated by superior returns. Risk Parity comes second (Sharpe: 0.24, Sortino: 0.29), followed by MVO (0.19\,/\,0.23) and Black-Litterman (0.15\,/\,0.18).
+
+Notably, the optimised strategies (MVO and Black-Litterman), which are theoretically intended to maximise risk-adjusted returns, actually underperformed the naive Equal Weight benchmark across all metrics. This is a well-documented phenomenon was mentioned above and is called the \textbf{``1/N puzzle''}. In practice, estimation error in expected returns and covariances often causes optimised portfolios to underperform simpler allocations out-of-sample.
+
+\subsubsection*{What does the drawdown chart reveal that the cumulative returns do not?}
+The cumulative returns chart presents a broadly upward narrative, but the drawdown chart tells a more nuanced story about the cost of participating in that growth.
 
 
+\medskip
+\noindent\textbf{\textit{Equal Weight's hidden fragility.}} Despite delivering the highest returns, Equal Weight also experienced the largest maximum drawdown at $-29.68\%$, most visibly during the COVID-19 market crash in early 2020. At that point, a \pounds100,000 portfolio would have temporarily lost nearly \pounds30,000 of value --- a risk that is easily missed in the smooth upward trajectory of the cumulative chart.
+
+\medskip
+\noindent\textbf{\textit{Equal Weight's hidden fragility:}} Despite delivering the highest returns, Equal Weight also experienced the largest maximum drawdown at $-29.68\%$, most visibly during the COVID-19 market crash in early 2020. At that point, a \pounds100k portfolio would have temporarily lost nearly \pounds30k of value.
+
+\medskip
+\noindent\textbf{\textit{Risk Parity's resilience under stress:}} Risk Parity and MVO share the best max drawdown ($-22.50\%$), and the drawdown chart shows Risk Parity recovered relatively quickly from most dips. Its comparatively low volatility (9.39\%) results in drawdowns that are both milder and shorter in duration, which is valuable for investors with lower loss tolerance or shorter time horizons.
+
+\medskip
+\noindent\textbf{\textit{Black-Litterman's 2022--2024 struggle:}} The drawdown chart highlights a sustained decline of over $-22\%$ between 2022 and 2024. This risk episode is partially masked in the cumulative return plot due to the strong performance recorded in 2020--2022.
+
+%% ─────────────────────────────────────────────
 \subsection{Risk-Return Trade-off}
 
+The previous section showed that Equal Weight delivered the strongest absolute returns over the period. This section examines whether that outperformance holds up when risk is taken into account, and whether any strategy maintains a consistent edge throughout the sample or simply benefits from favourable conditions at certain points in time. Two figures inform this discussion: a risk-return scatter showing where each strategy sits in volatility-return space over the full period, and a rolling 12-month Sharpe ratio tracking how risk-adjusted performance evolved through time.
+ 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{reports/images/plots/results/fig5_risk_return_scatter.pdf}
+    \caption{Risk-return scatter (one dot per strategy, volatility on x-axis, CAGR on y-axis).}
+    \label{fig:risk_return_scatter}
+\end{figure}
 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{reports/images/plots/results/fig6_rolling_sharpe.pdf}
+    \caption{Rolling 12-month Sharpe ratio (all four strategies, full sample period).}
+    \label{fig:rolling_sharpe}
+\end{figure}
+
+\subsubsection*{Positioning in Risk-Return Space}
+Equal Weight occupies the upper-right quadrant, offering the highest CAGR ($\sim$6.0\%) but also the highest volatility ($\sim$14.0\%). Risk Parity takes the opposite stance with the lowest volatility ($\sim$10\%) and $\sim$3.4\% CAGR. Black-Litterman sits in the middle at $\sim$4\% CAGR, though at volatility nearly as high as Equal Weight, offering little reward for that additional risk. MVO ends up being the most difficult to justify: higher volatility than Risk Parity yet the weakest return of all four ($\sim$2.7\%), placing it in a vulnerable position in risk-return space.
+
+\subsubsection*{Consistency of Risk-Adjusted Performance Over Time}
+The rolling 12-month Sharpe ratio reveals that no strategy maintains a persistent performance advantage across the full sample. All four strategies move largely in tandem, suggesting that the choice of strategy offers limited protection during systemic shocks and that the macroeconomic regime is a stronger determinant of short-term risk-adjusted performance than the allocation model itself.
+
+%% ─────────────────────────────────────────────
 \subsection{Regime Dependence}
+Full-period metrics can mask very different behaviour across market conditions. This section stress-tests the four strategies across three distinct episodes: the Brexit shock (Jun--Dec 2016), the COVID-19 crash (Feb--Sep 2020), and the 2022 rate-hiking cycle (Jan--Dec 2022), each representing a different type of market disruption. Table 3 and Figure 7 summarise cumulative returns across these periods.
 
 
+\begin{table}[H]
+\centering
+\caption{Strategy Performance During Key Market Events}
+\label{tab:stress_periods}
+\begin{tabular}{llrrrr}
+\toprule
+\textbf{Period} & \textbf{Event} & \textbf{EW} & \textbf{MVO} & \textbf{BL} & \textbf{RP} \\
+\midrule
+Jun--Dec 2016 & Brexit     &  15.95\% &   0.84\% &  20.28\% &   6.16\% \\
+Feb--Mar 2020 & COVID      & -25.84\% &   3.59\% & -13.44\% & -13.69\% \\
+Jan--Dec 2022 & Rate Hikes &   1.50\% &  -6.02\% & -10.90\% &  -4.34\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{reports/images/plots/results/fig7a_regime_brexit.pdf}
+    \caption{Regime: Brexit (Jun--Dec 2016).}
+    \label{fig:regime_brexit}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{reports/images/plots/results/fig7b_regime_covid.pdf}
+    \caption{Regime: COVID-19 (Feb--Mar 2020).}
+    \label{fig:regime_covid}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{reports/images/plots/results/fig7c_regime_2022.pdf}
+    \caption{Regime: Rate Hikes (Jan--Dec 2022).}
+    \label{fig:regime_2022}
+\end{figure}
+
+\subsubsection*{Brexit (Jun--Dec 2016)}
+The Brexit referendum triggered a sharp sterling depreciation and a rapid rotation into exporters and internationally-exposed equities. Black-Litterman was the standout performer, gaining 20.25\% over the period. Its view-adjusted allocations appear to have captured the post-referendum equity rebound effectively. Equal Weight followed at 15.95\%, benefiting from its broad exposure across assets without concentration risk pulling it in the wrong direction. Risk Parity lagged considerably at 6.16\%, its defensive, risk-equalising stance limiting upside participation during a strong directional move. MVO was essentially flat at 0.84\%, suggesting its concentrated positioning was poorly aligned with the assets that benefited most from the shock.
+
+\subsubsection*{COVID-19 (Feb--Sep 2020)}
+The COVID crash was sudden and indiscriminate, hitting all strategies hard in March 2020. What made a real difference is how quick and complete their recovery was. MVO recovered fastest and was the only strategy to finish the period in positive territory (+3.59\%), suggesting its concentrated positioning happened to align with assets. Black-Litterman and Risk Parity ended the period in almost identical territory ($-13.44\%$ and $-13.69\%$ respectively), but went under different paths. Black-Litterman clawed its way back to breakeven by June 2020 before a second selloff dragged it back down, while Risk Parity simply never recovered, staying underwater for the entire period without any meaningful rebound. Equal Weight was the worst performer by far, ending down $-25.84\%$. Its broad equity exposure amplified the drawdown, and the chart shows it had not recovered anywhere near its starting level by October 2020.
+
+\subsubsection*{Rate Hikes (Jan--Dec 2022)}
+2022 was uniquely damaging: equities and bonds sold off together, breaking a well-established negative correlation between these assets. Equal Weight was the most resilient, ending the year roughly flat at $+1.5\%$. Its lack of explicit bond exposure weighting meant it was less exposed to the bond sell-off than the more sophisticated models. Risk Parity ($-4.34\%$) held up better than its structural weakness would suggest. While the equity-bond correlation breakdown directly undermines its core diversification logic, losses were contained to a level that outperformed both MVO and Black-Litterman. This suggests that the risk spreading across other assets have provided a cushion. MVO ($-6.02\%$) fared worse than Risk Parity despite having no structural sensitivity to bond markets. Black-Litterman was the worst performer at $-10.9\%$, its view-adjusted allocations, effective during Brexit, proving ill-suited to the speed and severity of the 2022 repricing.
+
+%% ─────────────────────────────────────────────
 \subsection{Portfolio Characteristics}
+
+This section looks under the hood at how each strategy allocates capital and how much it trades to get there, two practical considerations that matter significantly for real-world implementation.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{reports/images/plots/results/fig8_allocation_heatmaps.pdf}
+    \caption{Allocation heatmaps for MVO, Black-Litterman, and Risk Parity (assets on y-axis, time on x-axis) --- Equal Weight omitted as trivially flat.}
+    \label{fig:allocation_heatmaps}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{reports/images/plots/results/fig9_turnover.pdf}
+    \caption{Average monthly turnover for all four strategies.}
+    \label{fig:turnover}
+\end{figure}
+
+\subsubsection*{Allocation Stability}
+
+The heatmaps reveal stark differences in how each strategy distributes and maintains its allocations over time.
+
+MVO is visibly the most unstable. Allocations shift dramatically from period to period, with heavy concentration rotating between a handful of assets. Most notably IGLT.L and SGLD.L dominating at different points, while the majority of the portfolio sits near zero for extended stretches. This ``all or nothing'' behaviour is characteristic of mean-variance optimisation, which tends to produce corner solutions that look very different from one rebalancing period to the next. In practice, this makes the portfolio difficult to manage and exposes investors to sharp, unintended shifts in risk profile between rebalancing dates.
+
+Black-Litterman appears to be smoother, with weights more evenly distributed across assets and less violent rotation between periods. IGLT.L consistently attracts a high allocation from 2018 onwards, which is worth noting as a point of concentration risk since a single asset commanding a persistently large share of the portfolio undermines the diversification the model is designed to provide.
+
+Risk Parity is the most stable of the three, with allocations broadly uniform across assets for most of the period. This is consistent with its design objective of equalising risk contribution rather than capital. The periodic spikes in IGLT.L weight reflect its lower historical volatility, which mechanically results in a higher risk-budget allocation within the framework. For an investor, this predictability is attractive and reduces operational uncertainty.
+
+\subsubsection*{Turnover and the Cost of Complexity}
+
+High turnover is not a sign of a well-functioning strategy, it is a cost. The turnover chart shows MVO trading at an average monthly rate of 34.7\%, by far the highest of the four: more than twice Black-Litterman (12.7\%), nearly four times Risk Parity (9.0\%), and almost fourteen times Equal Weight (2.5\%).
+
+Every rebalancing generates transaction costs such as brokerage fees and bid-ask spreads, which erode net returns. Given that MVO already delivered the weakest risk-adjusted performance on a gross basis, the addition of implementation costs would make its net performance even less competitive. MVO requires the greatest effort and cost to implement, yet provides the lowest return in comparison.
+
+Equal Weight, by contrast, requires minimal intervention, yet outperforms all three more complex strategies over the full period. This is perhaps the most pointed finding of the section: \textbf{complexity does not necessarily pay.}
 
 
 \section{Discussion}
@@ -476,3 +649,4 @@ Group C & 0.00 & 0.00 & 0.00 \\
 \bibliography{../refs/refs}
 
 \end{document}
+
