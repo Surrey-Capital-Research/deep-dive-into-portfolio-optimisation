@@ -1,5 +1,5 @@
 % !TeX root = main.tex
-\documentclass[a4paper,num-refs]{scr-contemporary}
+\documentclass[a4paper,alpha-refs]{scr-contemporary}
 
 \usepackage{xcolor}
 \usepackage{graphicx}
@@ -13,6 +13,13 @@
 \usepackage{newpxmath}
 \usepackage{ragged2e}
 \usepackage{booktabs}
+\usepackage{tikz}
+
+% SCR Colors
+\definecolor{scrdarkblue}{RGB}{30,90,160}
+\definecolor{scrblue}{RGB}{60,140,230}
+\definecolor{scrlightblue}{RGB}{235,245,255}
+\definecolor{accentorange}{RGB}{255,140,50}
 
 % Surrey Capital Research Specifics
 \jname{Surrey Capital Research} % Set the journal name to Surrey Capital Research
@@ -42,11 +49,12 @@
 \maketitle
 
 \begin{abstract}
-  \justifying
+
 \textbf{Background}:
   Selecting an optimal portfolio allocation across a universe of assets is a central problem in 
-  investment management. While mean-variance optimisation, first proposed by Markowitz (1952), provides a 
-  theoretically principled framework, its out-of-sample performance has proven disappointing in practice. 
+  investment management. A wide range of allocation strategies have been proposed, from naive              
+  diversification to theoretically grounded optimisation frameworks, yet their relative out-of-sample      
+  performance remains contested, particularly across varying market regimes.  
   This study empirically compares four portfolio strategies to assess whether model sophistication translates 
   into superior investment performance. \\
 \vspace{0.5mm}
@@ -120,14 +128,25 @@ implications. Section 6 concludes.
 
 \section{Literature and Theoretical Background}
 
-This section details the design of your study, the data used, the models applied, and the analytical framework. 
-The goal is to provide enough detail for another researcher to replicate your work.
-
 \subsection{Notation}
-Describe the data you used, where you got it from (e.g., Bloomberg, Refinitiv, web scraping), and any steps you 
-took to clean, process, or transform it. Mention the time period and frequency of the data.
+\indent \indent Some common notation that is used across this paper is the following:
 
-\subsection{The Equal Weight Puzzle}
+\begin{center}
+\begin{tabular}{l l}
+\toprule
+\textbf{Symbol} & \textbf{Description} \\
+\midrule
+$N$ & Number of assets in the portfolio \\
+$\mathbf{w} \in \mathbb{R}^N$ & Vector of portfolio weights \\
+$\boldsymbol{\mu} \in \mathbb{R}^N$ & Vector of expected returns \\
+$\boldsymbol{\Sigma} \in \mathbb{R}^{N \times N}$ & Covariance matrix of asset returns \\
+$\mathbf{1} \in \mathbb{R}^N$ & Vector of ones \\
+$r_f \in \mathbb{R}$ & Risk-free rate \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{The equal weight portfolio}
 
 \indent \indent The equal-weight (1/N) portfolio assigns an identical weight of 1/N to each asset in the portfolio, holding N assets, regardless of any asset-specific 
 characteristics such as return, volatility, or correlation. 
@@ -155,7 +174,7 @@ no attempt to diversify risk efficiently and cannot adapt to changing market con
 
 
 % ─────────────────────────────────────────────
-\subsection{Mean-Variance Optimisation}
+\subsection{Markowitz's mean-variance optimisation}
 \label{sec:mvo}
 
 \indent \indent \citet{markowitz_portfolio_1952} formulated \textit{Portfolio Selection} in 1952 as a constrained optimisation problem: minimise 
@@ -172,13 +191,7 @@ portfolio variance for a given level of expected return. His work stands as a ha
   \end{aligned}
 \end{equation}
 
-with
-  $\quad \quad \mathbf{w}, \boldsymbol{\mu} \in \mathbb{R}^N 
-  \quad \text{and} \quad
-  \hat{\boldsymbol{\Sigma}} \in \mathbb{R}^{N \times N} \quad \quad$ 
-as the vector of portfolio weights, the vector of expected returns with
-$\mu_p$ as the scalar target portfolio return and the sample covariance 
-matrix of asset returns estimated from historical data respectively. \\
+with $\mu_p$ as the scalar target portfolio return.
 
 The first constraint, also known as the return constraint, fixes the portfolio to a 
 specific point at the target level $\mu_p$, pinning the solution to a specific point on the "Efficient Frontier".
@@ -309,7 +322,7 @@ level attached to it. \newline
 where
 \begin{itemize}
   \item $P \in \mathbb{R}^{k \times n}$: the \emph{pick matrix} (which assets are involved)
-  \item $\boldsymbol{\mu} \in \mathbb{R}^k$ is the expected return
+  \item $\boldsymbol{\mu} \in \mathbb{R}^k$: the expected return
   \item $\boldsymbol{Q} \in \mathbb{R}^k$: the expected view returns
   \item $\Omega \in \mathbb{R}^{k \times k}$: view uncertainty (diagonal)
   \item $\boldsymbol{\varepsilon}$ (error-term): the deviation of true returns from the stated views, 
@@ -366,10 +379,91 @@ objective derived in Section~\ref{sec:mvo} (equation~\ref{eq:msr}),
 substituting $\boldsymbol{\mu}_{\text{BL}}$ in place of the sample mean $\boldsymbol{\mu}$.
 
 
-\subsection{Dalio's Risk Parity}
+\subsection{Risk Parity}
 
+\begin{keypoints*}
+\begin{itemize}
+  \item xx
+  \item xx
+  \item xx
+\end{itemize}
+\end{keypoints*}
+
+\indent \indent The modern Risk Parity framework was popularised by Ray Dalio 
+at Bridgewater Associates and underpins the All Weather strategy introduced 
+in the 1990s. The approach was subsequently
+formalised by \citet{maillard_properties_2010}, who derived the mathematical
+conditions for equal risk contribution portfolios. \\
+\indent The central motivation
+departs entirely from the MVO and BL frameworks: rather than optimising
+expected return for a given level of risk, Risk Parity ignores return estimates
+altogether and instead focuses on how risk is distributed across the portfolio.
+
+\indent Risk Parity addresses a structural limitation shared by both MVO and
+the equal-weight portfolio:
+\begin{enumerate}
+  \vspace{-2mm}
+  \item In MVO and BL, allocations depend on estimated expected returns, which
+  are noisy and prone to estimation error.
+  \item In equal-weight portfolios, capital is diversified equally but risk is not.
+  Assets with high volatility dominate total portfolio risk despite receiving the
+  same capital allocation.
+  \vspace{-2mm}
+\end{enumerate}
+
+\noindent \emph{Risk Decomposition} \\
+\indent Portfolio volatility $\sigma_p = \sqrt{\mathbf{w}^\top \boldsymbol{\Sigma} \mathbf{w}}$
+is a homogeneous function of degree 1 in $\mathbf{w}$. By Euler's homogeneous
+function theorem, it admits the following decomposition:
+\begin{equation}
+  \sigma_p = \sum_{i=1}^{N} w_i \frac{\partial \sigma_p}{\partial w_i}
+\end{equation}
+The \emph{marginal risk contribution} (MRC) of asset $i$ is:
+\begin{equation}
+  \text{MRC}_i = \frac{\partial \sigma_p}{\partial w_i}
+  = \frac{(\boldsymbol{\Sigma}\mathbf{w})_i}{\sigma_p}
+\end{equation}
+and the total \emph{risk contribution} (RC) of asset $i$ is:
+\begin{equation}
+  \text{RC}_i = w_i \cdot \text{MRC}_i
+  = \frac{w_i\,(\boldsymbol{\Sigma}\mathbf{w})_i}{\sigma_p}
+\end{equation}
+with the useful property that $\sum_{i=1}^{N} \text{RC}_i = \sigma_p$. \\
+
+\noindent \emph{The Risk Parity Condition} \\
+\indent The portfolio is said to be \emph{risk-balanced} when every asset
+contributes equally to total portfolio volatility:
+\begin{equation}
+  \text{RC}_i = \frac{\sigma_p}{N} \quad \forall\, i
+\end{equation}
+Since $\sigma_p$ appears on both sides, this reduces to the equivalent condition:
+\begin{equation}
+  w_i\,(\boldsymbol{\Sigma}\mathbf{w})_i = c \quad \forall\, i
+  \label{eq:rp}
+\end{equation}
+for some constant $c > 0$, subject to $\mathbf{1}^\top \mathbf{w} = 1$ and $\mathbf{w} \geq \mathbf{0}$.
+This system has no closed-form solution in general and is solved numerically;
+the implementation details are described in Section~\ref{sec:methodology}. \\
+
+\noindent \emph{Special Case: Uncorrelated Assets} \\
+\indent When $\boldsymbol{\Sigma}$ is diagonal, the risk parity condition reduces to
+an analytic solution. Equal risk contribution then requires each asset's weight to be
+proportional to the inverse of its volatility:
+\begin{equation}
+  w_i^{\mathrm{RP}} = \frac{1/\sigma_i}{\displaystyle\sum_{j=1}^{N} 1/\sigma_j}
+\end{equation}
+\indent This inverse-volatility weighting is the closed-form limit of risk parity, and also
+serves as the natural initialisation point for the numerical solver in the general case.
+
+\indent Despite its appeal, Risk Parity has a well-known structural consequence:
+it mechanically overweights low-volatility assets. In a portfolio containing
+both equities and government bonds, bonds receive substantially larger
+capital allocations precisely because their volatility is lower, which raises
+the question of whether the resulting portfolio is truly diversified in an
+economic sense or merely in a statistical one.
 
 \section{Methodology}
+\label{sec:methodology}
 
 \subsection{Data}
 The dataset contains daily adjusted closing prices for an 18-asset universe over a 10-year period, spanning from January 1st 2015, to December 31st 2025. The universe is made to reflect a representative UK-centric multi-asset portfolio. It consists of 15 large-cap equities across various sectors, which include Financials, Energy, and healthcare, as well as three diversifying exchange-traded products: UK Government Gilts (IGLT.L), Gold (SGLD.L), and an extensive Commodities basket (WCOG.L). All of this pricing data is programmatically sourced via Yahoo Finance.
@@ -396,7 +490,24 @@ The strategies are evaluated using a walk-forward backtesting engine to ensure z
 
 Critically, the simulation relies on several foundational assumptions. We assume perfect asset divisibility, allowing the allocation of fractional shares to match exact target weights. In addition, we assume immediate execution at the end-of-day adjusted close price on the rebalancing date. To simulate real-world implementation frictions and measure the impact of portfolio turnover, a flat transaction cost of 5 basis points ($0.05\%$) is deducted per unit of traded value during each monthly rebalance. Any capital not allocated to the active asset matrix is held as an uninvested cash balance yielding $0\%$. Furthermore, the simulation does not explicitly model non-linear market impact or bid--ask spread expansion during liquidity crises. It is assumed that the 18 selected large-cap assets possess sufficient market depth to absorb the hypothetical order flow without inducing severe execution slippage.
 
+\begin{center}
+\begin{tikzpicture}[node distance=1.5cm, scale=0.9, every node/.style={scale=0.9}]
+    \tikzstyle{block} = [rectangle, draw, fill=scrblue,
+        text width=3.5cm, text centered, rounded corners=4pt, minimum height=1cm,
+        line width=1pt, draw=scrblue]
+    \tikzstyle{arrow} = [thick,->,>=stealth,color=scrblue]
 
+    \node [block] (data) {Past Price Data\\(up to rebalance date)};
+    \node [block, below of=data] (strategy) {Strategy Computes\\Target Weights};
+    \node [block, below of=strategy] (rebalance) {Rebalance Portfolio};
+    \node [block, below of=rebalance] (track) {Track Portfolio Value};
+
+    \draw [arrow] (data) -- (strategy);
+    \draw [arrow] (strategy) -- (rebalance);
+    \draw [arrow] (rebalance) -- (track);
+    \draw [arrow] (track.east) -- ++(2,0) |- node[near start, right, font=\footnotesize] {\textcolor{black}{Next Month}} (data.east);
+\end{tikzpicture}
+\end{center}
 \subsection{Performance Metrics}
 All metrics we're using
 (Return, Sharpe, Sortino, Volatility, CAGR, Max DD, VaR, CVaR)
