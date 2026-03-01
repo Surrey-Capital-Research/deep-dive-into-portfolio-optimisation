@@ -29,6 +29,7 @@ class Backtester:
         initial_capital: float = 100_000.0,
         rebalance_freq: str = "ME",  # month-end, not "M"
         cost_model: Optional[Callable[[pd.Series], float]] = None,
+        risk_free_rate: float | pd.Series = 0.0,
     ):
         """
         Parameters
@@ -43,12 +44,16 @@ class Backtester:
             Pandas offset alias for rebalance frequency (e.g. 'ME' for month-end).
         cost_model : Callable
             Optional function that takes a trade notional per ticker and returns total transaction cost.
+        risk_free_rate : float or pd.Series
+            Annualised risk-free rate used to compute Sharpe and Sortino. If a Series,
+            the mean over the backtest period is used.
         """
         self.prices = prices.sort_index()
         self.strategy = strategy
         self.initial_capital = float(initial_capital)
         self.rebalance_freq = rebalance_freq
         self.cost_model = cost_model
+        self.risk_free_rate = risk_free_rate
 
         self.tickers = list(self.prices.columns)
 
@@ -136,7 +141,18 @@ class Backtester:
             pd.concat(trades_records, ignore_index=True) if trades_records else pd.DataFrame()
         )
 
-        metrics = self._compute_metrics(equity_curve)
+        if isinstance(self.risk_free_rate, pd.Series):
+            avg_rf = float(self.risk_free_rate.reindex(equity_curve.index, method="ffill").mean())
+        else:
+            avg_rf = float(self.risk_free_rate)
+
+        holdings = positions_history.astype(float).multiply(
+            self.prices.reindex(positions_history.index).ffill()
+        )
+        weights = holdings.divide(equity_curve.reindex(positions_history.index), axis=0).clip(0, 1)
+        monthly_weights = weights.resample("ME").last()
+
+        metrics = self._compute_metrics(equity_curve, avg_rf, monthly_weights)
 
         return BacktestResult(
             equity_curve=equity_curve,
@@ -146,7 +162,11 @@ class Backtester:
         )
 
     @staticmethod
-    def _compute_metrics(equity_curve: pd.Series) -> dict:
+    def _compute_metrics(
+        equity_curve: pd.Series,
+        risk_free_rate: float = 0.0,
+        monthly_weights: pd.DataFrame | None = None,
+    ) -> dict:
         """
         Compute simple performance metrics from a daily equity curve.
         """
@@ -170,14 +190,20 @@ class Backtester:
 
         downside = rets[rets < 0]
         downside_vol = downside.std() * np.sqrt(252)
-        sortino = cagr / downside_vol if downside_vol > 0 else np.nan
+        sortino = (cagr - risk_free_rate) / downside_vol if downside_vol > 0 else np.nan
 
         vol = rets.std() * np.sqrt(annual_factor)
-        sharpe = cagr / vol if vol > 0 else np.nan
+        sharpe = (cagr - risk_free_rate) / vol if vol > 0 else np.nan
 
         running_max = equity_curve.cummax()
         drawdown = equity_curve / running_max - 1.0
         max_dd = drawdown.min()
+
+        avg_monthly_turnover = (
+            float(monthly_weights.diff().abs().sum(axis=1).dropna().mean())
+            if monthly_weights is not None
+            else float("nan")
+        )
 
         return {
             "total_return": float(total_return),
@@ -188,4 +214,5 @@ class Backtester:
             "max_drawdown": float(max_dd),
             "95% VaR": float(var_95),
             "95% CVaR": float(cvar_95),
+            "avg_monthly_turnover": avg_monthly_turnover,
         }

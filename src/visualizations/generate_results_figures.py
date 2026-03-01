@@ -94,9 +94,6 @@ def rolling_sharpe(equity: pd.Series, window: int = 252) -> pd.Series:
     return (rets.rolling(window).mean() * 252) / (rets.rolling(window).std() * np.sqrt(252))
 
 
-def avg_monthly_turnover(weights: pd.DataFrame) -> float:
-    monthly = weights.resample("ME").last()
-    return float(monthly.diff().abs().sum(axis=1).dropna().mean())
 
 
 def save(fig: plt.Figure, name: str) -> None:
@@ -104,7 +101,6 @@ def save(fig: plt.Figure, name: str) -> None:
     fig.savefig(path, dpi=300, bbox_inches="tight")
     print(f"  Saved: {path}")
     plt.close(fig)
-
 
 # ── Figure 3: Cumulative Wealth ───────────────────────────────────────────────
 def fig_cumulative_wealth(results: dict[str, BacktestResult]) -> None:
@@ -118,7 +114,7 @@ def fig_cumulative_wealth(results: dict[str, BacktestResult]) -> None:
         mticker.FuncFormatter(lambda v, _: f"£{v/1_000:.0f}k")
     )
     ax.set_ylabel("Portfolio Value", fontsize=10)
-    ax.legend(loc="upper left")
+    ax.legend(loc="upper left", frameon=False)
     ax.grid(True, axis="y")
     fig.tight_layout()
     save(fig, "fig3_cumulative_wealth")
@@ -275,13 +271,13 @@ def fig_heatmaps(results: dict[str, BacktestResult], prices: pd.DataFrame) -> No
 
 
 # ── Figure 9: Turnover Bar Chart ──────────────────────────────────────────────
-def fig_turnover(results: dict[str, BacktestResult], prices: pd.DataFrame) -> None:
+def fig_turnover(results: dict[str, BacktestResult]) -> None:
     plt.rcParams.update(STYLE)
     fig, ax = plt.subplots(figsize=(3.5, 3.2))
 
-    names    = list(COLOURS.keys())
-    turnovers = [avg_monthly_turnover(compute_weights(results[n], prices)) for n in names]
-    colours  = [COLOURS[n] for n in names]
+    names     = list(COLOURS.keys())
+    turnovers = [results[n].metrics["avg_monthly_turnover"] for n in names]
+    colours   = [COLOURS[n] for n in names]
 
     bars = ax.bar(names, turnovers, color=colours, width=0.55, linewidth=0, zorder=2)
 
@@ -317,7 +313,6 @@ def main() -> None:
     fig_rolling_sharpe(results)
     fig_regimes(results)
     fig_heatmaps(results, prices)
-    fig_turnover(results, prices)
     print("\nAll figures saved to", SAVE_DIR)
 
 
