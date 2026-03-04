@@ -24,6 +24,8 @@ planning/
 *.snm
 
 *.pdf
+!reports/images/scr-logo.pdf
+!reports/images/surrey-logo.pdf
 
 # AI slop
 CLAUDE.md
