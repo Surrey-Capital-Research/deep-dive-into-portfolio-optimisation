@@ -1,161 +1,1416 @@
-\documentclass[a4paper,num-refs]{apcr-contemporary} % Use our custom class
+% !TeX root = main.tex
+\documentclass[a4paper,alpha-refs]{scr-contemporary}
 
 \usepackage{xcolor}
 \usepackage{graphicx}
 \usepackage{siunitx}
-\usepackage{amsmath} % For advanced mathematical typesetting
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{newpxmath}
+\usepackage{ragged2e}
+\usepackage{booktabs}
+\usepackage{tikz}
 
-% AP Capital Research Specifics
-\jname{AP Capital Research} % Set the journal name to AP Capital Research
+\captionsetup{justification=centering}
+\let\mathscr\undefined
 
-\secondlogo{../images/apcr-logo.pdf} % Placeholder for University of Surrey logo
-\jlogo{../images/surrey-logo.pdf} % Placeholder for APCR logo
+% Surrey Capital Research Specifics
+\jname{Surrey Capital Research} % Set the journal name to Surrey Capital Research
+
+\secondlogo{../images/scr-logo.pdf} % Surrey Capital Research logo
+\jlogo{../images/surrey-logo.pdf} % University of Surrey logo
 
 
-\title{Research Report Title}
+\title{A Deep Dive into Portfolio Optimisation}
 
-\author{Author Names}
-% \author{Author Name} % Add more authors as needed
+\author{\fontsize{12pt}{12pt}\selectfont Riccardo di Silvio, Jack Humphries, Sofiya Kolokolnikova, Freya Cullen, Alex Inskip}
 
-\affil{AP Capital Research, University of Surrey}
+\affil{Surrey Capital Research, University of Surrey}
 \papercat{Quantitative Research}
 
-\runningauthor{AP Capital Research}
+\runningauthor{Surrey Capital Research}
 
 \jvolume{01}
 \jnumber{01}
-\jyear{2025}
+\jyear{2026}
+
+\numberwithin{equation}{section}
 
 \begin{document}
 
 \begin{frontmatter}
 \maketitle
-\begin{abstract}
-This abstract should summarize the key aspects of the report. It should concisely outline the research 
-background, methodology, main findings, and conclusions. Aim for approximately 250 words, avoiding citations 
-and minimizing abbreviations.
 
-\textbf{Background}: Introduce the topic and the problem your research addresses.
-\textbf{Methodology}: Describe the methods and data used in your analysis.
-\textbf{Results}: Highlight the main outcomes and observations.
-\textbf{Conclusions}: Summarize the key insights and implications of your findings.
+\begin{abstract}
+
+\textbf{Background}:
+  Selecting an optimal portfolio allocation across a universe of assets is a central problem in 
+  investment management. A wide range of allocation strategies have been proposed, from naive              
+  diversification to theoretically grounded optimisation frameworks, yet their relative out-of-sample      
+  performance remains contested, particularly across varying market regimes.  
+  This study empirically compares four portfolio strategies to assess whether model sophistication translates 
+  into superior investment performance. \\
+\vspace{0.5mm}
+\textbf{Methodology}:
+  This study implements and compares four portfolio strategies: equal weight, Markowitz mean-variance, 
+  Black-Litterman and Risk Parity applied to an 18-asset UK multi-asset portfolio comprising 15 FTSE 100 equities, 
+  a UK government bond ETF, a gold ETC and a broad commodities ETF, over the period January 2015 to December 2025. 
+  Strategies are evaluated using a monthly rebalancing framework and assessed across annualised return, volatility, 
+  Sharpe ratio, maximum drawdown and portfolio turnover. \\
+\vspace{0.5mm}
+  \textbf{Results}:
+  We find results broadly consistent with DeMiguel et al. (2009), with the naive benchmark 
+  proving difficult to displace on a risk-adjusted basis over the full sample period. The optimisation 
+  strategies exhibit meaningfully different risk profiles, however, suggesting that Sharpe ratio alone does not 
+  fully capture the practical trade-offs between approaches. \\
 \end{abstract}
 
-\begin{keywords}
-Keyword1; Keyword2; Keyword3; Keyword4; Keyword5
-\end{keywords}
 \end{frontmatter}
 
 \begin{keypoints*}
 \begin{itemize}
-\item Key finding or takeaway 1.
-\item Key finding or takeaway 2.
-\item Key finding or takeaway 3.
+  \item The equal-weight portfolio is robust because it does not rely on 
+  estimated parameters and is therefore unaffected by estimation error.
+  \item The Efficient Frontier is the set of portfolios that deliver the minimum 
+  possible variance for each level of expected return.
+  \item Empirical evidence suggests that many optimisation models fail to 
+  consistently outperform the equal-weight portfolio out of sample.
 \end{itemize}
 \end{keypoints*}
 
 \section{Introduction}
-Portfolio optimisation is a process of strategically selecting a diverse range of assets to build an 
-investment portfolio that offers the maximum expected returns for a given level of risk. This can be 
-calculated using mathematical models, of which we have selected four: Equally Weighted, Markowitz 
-mean/variance optimisation, Black-Litterman and Risk Parity. Together, these models provide a strong 
-theoretical foundation. While Mean-Variance optimisation is central to modern portfolio theory, it often
-performs poorly in practice due to estimation errors. Therefore, an inclusion of Bayesian frameworks and
-risk-based allocation methods is designed to improve robustness and empirical performance.
+\subsection{The Portfolio Allocation Problem}
+\indent \indent The portfolio allocation problem is the fundamental question in investment management. 
+It asks: How should capital be distributed across available investment opportunities to best achieve 
+an investor's objectives? \\
+\indent The problem was intractable until 1952, when Harry Markowitz published \textit{Portfolio Selection} in the 
+\textit{Journal of Finance} and turned it into a clean optimisation problem, and the “efficient frontier” 
+gave investors a principled answer. Markowitz's mean variance model minimises portfolio variance for a given 
+level of expected return. It was revolutionary in the consideration of variance as the risk, standing as a 
+hallmark of modern portfolio theory. In practice however, the model has proven difficult to implement reliably. \\
+\indent Michaud (1989) challenged this view directly, arguing that small estimation errors in expected 
+returns produce wildly unstable portfolio recommendations. \\
+\indent In 2009, DeMiguel et al. delivered a provocative result: he found that even sophisticated strategies 
+incorporating shrinkage estimators and Bayesian methods failed to consistently outperform 1/N out-of-sample, 
+suggesting that estimation error dominates theoretical optimality for typical portfolio problems. This tension 
+between the theoretical elegance of optimisation and its empirical fragility motivates the present study. 
 
-This report conducts a rigorous empirical comparison of portfolio optimisation, which is applied to a 
-selected 18-asset portfolio spanning 2015-2025. The asset universe includes: UK equities, government 
-bonds, precious metals and broader commodities. It defines the scope of our analysis so that findings 
-are realistic and diversified in the investment universe. 
 
-The objective of this project is to evaluate the risk-return performance by implementing and backtesting
-multiple portfolio techniques to understand characteristics, trade-offs and practical applicability. 
-While comparing classical optimisation techniques to alternative approaches to optimise empirical 
-robustness in a real-world investment setting.
+\subsection{Research Objectives}
+\indent \indent This study addresses three main questions:
+\begin{enumerate}
+    \item Do optimisation models outperform a naive 1/N benchmark
+    out-of-sample, applied to a multi-asset UK portfolio over 
+    a ten-year period? 
+    \item Which model offers the best risk-adjusted performance, 
+    as measured by the Sharpe ratio?
+    \item How does model performance vary across distinct market
+    regimes: the Brexit referendum (2016), the COVID-19 crash (2020),
+    and the 2022 rate-hiking cycle?
+\end{enumerate}
 
-\subsection{Background and Research Objectives}
-Provide the necessary background information for the reader to understand the context of your research. 
-Clearly state your primary and secondary research objectives.
+\subsection{Structure of the Report}
+\indent \indent The remainder of this report is organised as follows: \newline
+Section 2 reviews the theoretical foundations of each model 
+and derives their key mathematical results. Section 3 
+describes the data, implementation choices, and backtesting 
+framework. Section 4 presents the empirical results, including 
+full-period performance metrics and a breakdown by market 
+regime. Section 5 discusses the findings and their practical 
+implications. Section 6 concludes.
 
-\section{Methodology}
+\section{Literature Review and Background}
+\label{sec:theory}
+\subsection{Notation}
+\indent \indent Some common notation that is used across this paper is the following:
 
-This section details the design of your study, the data used, the models applied, and the analytical framework. 
-The goal is to provide enough detail for another researcher to replicate your work.
-
-\subsection{Data Acquisition and Processing}
-Describe the data you used, where you got it from (e.g., Bloomberg, Refinitiv, web scraping), and any steps you 
-took to clean, process, or transform it. Mention the time period and frequency of the data.
-
-\subsection{Analytical Models}
-Describe the quantitative or qualitative models used in your analysis. Include mathematical formulations if 
-applicable. For example, if you are using a regression model, you would specify it here:
-\begin{equation}
-Y = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \epsilon
-\end{equation}
-Explain the variables and the assumptions of the model.
-
-\subsection{Backtesting or Validation Framework}
-If you are testing a strategy, describe the backtesting framework. Mention key parameters like rebalancing 
-frequency, transaction cost assumptions, and performance metrics used.
-
-\section{Results and Discussion}
-
-This section presents the key findings from your analyses and interprets their significance \cite{example2023}. Use figures and tables to present your results clearly.
-
-\subsection{Primary Findings}
-Present your main results. This could be in the form of tables summarizing statistical outputs, or charts showing trends and relationships.
-
-\begin{figure}[bt!]
-\centering
-% \includegraphics[width=\linewidth]{path/to/your/figure.pdf} % Example: \includegraphics[width=0.8\linewidth]{figures/performance_chart.pdf}
-\caption{Descriptive caption for your figure.}\label{fig:example_figure}
-\end{figure}
-
-\begin{table}[bt!]
-\caption{Descriptive caption for your table.}\label{tab:example_table}
-\begin{tabular}{l c c c}
+\begin{center}
+\begin{tabular}{l l}
 \toprule
-Category & Metric 1 & Metric 2 & Metric 3 \\ 
+\textbf{Symbol} & \textbf{Description} \\
 \midrule
-Group A & 0.00 & 0.00 & 0.00 \\ 
-Group B & 0.00 & 0.00 & 0.00 \\ 
-Group C & 0.00 & 0.00 & 0.00 \\ 
+$N$ & Number of assets in the portfolio \\
+$\mathbf{w} \in \mathbb{R}^N$ & Vector of portfolio weights \\
+$\boldsymbol{\mu} \in \mathbb{R}^N$ & Vector of expected returns \\
+$\boldsymbol{\Sigma} \in \mathbb{R}^{N \times N}$ & Covariance matrix of asset returns \\
+$\mathbf{1} \in \mathbb{R}^N$ & Vector of ones \\
+$r_f \in \mathbb{R}$ & Risk-free rate \\
 \bottomrule
 \end{tabular}
-\begin{tablenotes}
-\item Note: Explain any specific details about the data in the table.
-\end{tablenotes}
+\end{center}
+
+\subsection{The equal weight portfolio}
+
+\indent \indent The equal-weight (1/N) portfolio assigns an identical weight of 1/N to each asset in the portfolio, holding N assets, regardless of any asset-specific 
+characteristics such as return, volatility, or correlation. 
+\citet{demiguel_optimal_2009} tested 14 optimisation models across 7 datasets. None consistently outperformed the naive equal-weight portfolio: 
+\begin{equation}
+  w_i = \frac{1}{N} \quad \text{for} \quad 1 \leq i \leq N
+\end{equation}
+\indent But why? When expected returns are estimated from historical data in order to determine optimal portfolio weights, the estimates 
+improve as more data is collected, but they do so slowly. \newline
+Formally, the estimation error decays as
+\begin{equation}
+  \hat{\mu} - \mu = \mathcal{O}\!\left(\frac{1}{\sqrt{T}}\right)
+\end{equation}
+where $T$ is the number of observations.
+
+Because the error shrinks at rate $\frac{1}{\sqrt{T}}$, halving the 
+error requires four times as much data, meaning that with monthly data 
+and realistic return distributions, approximately 500 years of observations 
+are required for statistically reliable estimates, especially since these
+errors are amplified through the term $\Sigma^{-1}\hat{\mu}$. \newline
+\indent The equal-weight portfolio sidesteps this problem entirely: by assigning a fixed weight to each asset, it requires no parameter estimation 
+and is therefore immune to estimation error by construction. \newline
+The cost of this simplicity, however, is that the portfolio ignores all information about assets' risk and return characteristics, makes 
+no attempt to diversify risk efficiently and cannot adapt to changing market conditions.
+
+
+% ─────────────────────────────────────────────
+\subsection{Markowitz's mean-variance optimisation}
+\label{sec:mvo}
+
+\indent \indent \citet{markowitz_portfolio_1952} formulated \textit{Portfolio Selection} in 1952, approaching the asset 
+allocation problem as a constrained optimisation problem: minimise 
+portfolio variance for a given level of expected return, the foundation of the mean-variance model.
+His work stands as a hallmark of modern portfolio theory.\newline
+\indent Formally, the problem states:
+\begin{equation}                                         
+  \begin{aligned}
+  \min_{\mathbf{w}} \hat{\sigma} =
+  \mathbf{w}^\top \hat{\boldsymbol{\Sigma}}\ \mathbf{w}
+  \quad \text{s.t.} \quad
+  \mathbf{w}^\top \boldsymbol{\mu} = \mu_p
+  \quad \text{;} \quad 
+  \mathbf{w}^\top\mathbf{1} = 1
+  \end{aligned}
+\end{equation}
+
+with $\mu_p$ as the scalar target portfolio return.
+
+The first constraint, also known as the return constraint, fixes the portfolio to a 
+specific point at the target level $\mu_p$, pinning the solution to a specific point on the "Efficient Frontier".
+By varying $\mu_p$ across all feasible values, the complete set of minimum-variance 
+portfolios - the Efficient Frontier - is traced out.
+The second constraint, i.e. the budget constraint, ensures the weights represent a valid
+allocation of wealth, hence that the sum of all weights is always equal to $1$. \newline
+\indent It is important to note that no domain-restriction condition is imposed on the budget constraint,
+each $w_i$ may take any real value, in particular, negative ones.
+Practically speaking, a negative weight corresponds to a short position in the associated asset.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.45\textwidth]{../images/plots/theory/efficient_frontier.pdf}
+    \caption{Efficient Frontier estimated using sample covariance}
+    \label{fig:efficient_frontier}
+\end{figure}
+
+Because the objective function is quadratic and the constraints are linear equalities, we cannot solve the problem by direct substitution 
+(two constraints, n unknowns). We therefore use the method of Lagrange multipliers. 
+The Lagrangian formulation is:
+
+\begin{equation}
+  \mathcal{L}(\mathbf{w}, \lambda, \gamma)
+      = \mathbf{w}^\top \boldsymbol{\Sigma} \mathbf{w}
+      - \lambda\!\left(\mathbf{w}^\top \boldsymbol{\mu} - \mu_p\right)
+      - \gamma\!\left(\mathbf{1}^\top \mathbf{w} - 1\right)
+\end{equation}
+
+where $\lambda$ and $\gamma$ are the Lagrange multipliers associated with the return and budget constraints, respectively. 
+Intuitively, $\lambda$ captures the marginal cost of requiring a higher return (i.e. how much additional variance must be accepted 
+per unit increase in $\mu_p$), and $\gamma$ enforces full investment.
+
+Taking the first-order condition:
+\begin{equation}
+  \frac{\partial \mathcal{L}}{\partial \mathbf{w}} = 2\boldsymbol{\Sigma} \mathbf{w} - \lambda \boldsymbol{\mu} - \gamma \mathbf{1} = \mathbf{0}
+\end{equation}
+
+Solving gives:
+\begin{equation}
+  \mathbf{w}_p = \frac{\lambda}{2}\,\boldsymbol{\Sigma}^{-1}\boldsymbol{\mu} + \frac{\gamma}{2}\,\boldsymbol{\Sigma}^{-1}\mathbf{1}
+\end{equation}
+
+Imposing the budget and return constraints leads to the following two-fund theorem: all efficient portfolios can be expressed as a 
+linear combination of any two distinct efficient portfolios.
+\begin{equation}
+  \mathbf{w}_A = \frac{\boldsymbol{\Sigma}^{-1}\mathbf{1}}{\mathbf{1}^\top \boldsymbol{\Sigma}^{-1}\mathbf{1}}
+  \qquad
+  \mathbf{w}_B = \frac{\boldsymbol{\Sigma}^{-1}\boldsymbol{\mu}}{\mathbf{1}^\top \boldsymbol{\Sigma}^{-1}\boldsymbol{\mu}}
+\end{equation}
+
+Note that $\mathbf{w}_A$ is the \emph{global minimum variance} (GMV) portfolio, 
+the leftmost point on the efficient frontier, obtained by dropping the 
+return constraint and minimising variance subject only to full investment:
+\begin{equation}
+  \mathbf{w}_{\mathrm{GMV}}
+    = \frac{\boldsymbol{\Sigma}^{-1}\mathbf{1}}{\mathbf{1}^\top \boldsymbol{\Sigma}^{-1}\mathbf{1}}
+\end{equation}
+
+And the \emph{maximum Sharpe ratio} portfolio is:
+\begin{equation}
+  \mathbf{w}_{\mathrm{MSR}}
+    = \frac{\boldsymbol{\Sigma}^{-1}(\boldsymbol{\mu} - r_f \mathbf{1})}
+           {\mathbf{1}^\top \boldsymbol{\Sigma}^{-1}(\boldsymbol{\mu} - r_f \mathbf{1})}
+  \label{eq:msr}
+\end{equation}
+\indent Despite its theoretical elegance, Markowitz optimisation suffers from a well-documented problem. 
+As mentioned above, the solution depends critically on $\boldsymbol{\mu}$ and $\boldsymbol{\Sigma}$, both estimated from historical data. \newline
+\indent Small errors in $\mathbf{\mu}$ can cause large shifts in optimal weights.
+\citet{michaud_markowitz_1989} characterised the optimiser as an "error maximiser": it systematically overweights assets with 
+overestimated returns and underestimated variances.
+
+\begin{keypoints*}
+\begin{itemize}
+  \item Black-Litterman uses market-cap weights as a neutral 
+  starting point for expected returns.
+  \item Subjective investor views are blended with the equilibrium
+  prior through a Bayesian update.
+  \item The optimisation step in Black-Litterman is the same as MVO
+  with $\boldsymbol{\mu}_{BL}$ replacing the sample mean.                                                    
+\end{itemize}
+\end{keypoints*}
+
+% ─────────────────────────────────────────────
+\subsection{Black-Litterman and its Bayesian approach}
+
+\indent \indent The Black-Litterman (BL) model was developed by Fischer Black and 
+Robert Litterman at Goldman Sachs in the early 1990s 
+to address the instability of Mean-Variance Optimisation \citep{black_asset_1991, black_global_1992}.
+
+\indent The BL model addresses two shortcomings of classic mean-variance optimisation:
+\begin{enumerate}
+  \vspace{-2mm}
+  \item What expected returns should be used? \newline
+  Rather than relying on historical data, BL uses returns implied by current 
+  market-cap weights as the neutral starting point.
+  \item How should the views be incorporated? \newline
+  BL offers a formal Bayesian framework for blending subjective investor views 
+  with this equilibrium prior, weighting each source inversely by its uncertainty.
+  \vspace{-2mm}
+\end{enumerate}
+
+\noindent \textbf{\emph{Step 1. Equilibrium Returns}} \\
+\indent The model takes as its starting point the equilibrium expected returns implied 
+by the market portfolio, i.e. the portfolio where each asset is held in proportion
+to its market capitalisation.
+Assuming the market portfolio is mean-variance efficient, the equilibrium excess returns are:
+\begin{equation}
+\Pi = \delta \Sigma w_{m}
+\end{equation}
+where $w_m$ is the market-cap weight vector, $\Sigma$ is the covariance 
+matrix of asset returns and $\delta$ is the risk-aversion coefficient
+\begin{equation}
+  \delta = \frac{r_m - r_f}{\sigma_m^2}
+\end{equation}
+with $r_m$ the return of the market portfolio and $\sigma^2$ its variance. \\
+
+\noindent \textbf{\emph{Step 2. Express Views}} \\
+\indent A view can be absolute or relative, for example "asset A will return 5\%" or 
+"asset A will outperform asset B by 2\%".
+Each view has two components: the expected return itself and a confidence 
+level attached to it. \newline
+\indent Formally, k views are expressed through the following system:
+\begin{equation}
+  P \boldsymbol{\mu} = \boldsymbol{Q} + \boldsymbol{\varepsilon}
+  \qquad \boldsymbol{\varepsilon} \sim \mathcal{N}(\mathbf{0}, \Omega)
+\end{equation}
+where:
+\begin{center}
+\begin{tabular}{l l}
+\toprule
+\textbf{Symbol} & \textbf{Description} \\
+\midrule
+$P \in \mathbb{R}^{k \times n}$ & \emph{Pick matrix}: encodes which assets views involve \\
+$\boldsymbol{\mu} \in \mathbb{R}^k$ & Vector of expected returns \\
+$\boldsymbol{Q} \in \mathbb{R}^k$ & Expected view returns \\
+$\Omega \in \mathbb{R}^{k \times k}$ & View uncertainty matrix (diagonal) \\
+$\boldsymbol{\varepsilon} \sim \mathcal{N}(\mathbf{0}, \Omega)$ & View error: deviation of true returns from stated views \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\indent Assets are ranked by their return over the previous 12 months, excluding the most 
+recent month to eliminate short-term reversal effects. The highest-return tercile forms
+the winner portfolio, while the lowest-return decile constitutes the loser portfolio. \\
+\indent The view is expressed as:
+\begin{equation}
+    \boldsymbol{p}_{k}^{\top} \boldsymbol{\mu} = q_k
+\end{equation}
+\indent $\boldsymbol{p}_k$ assigns equal positive weights to winner assets and equal negative weights 
+to loser assets, forming a long-short momentum view. The expected return 
+spread $q_k$ is estimated over a rolling window at each rebalancing date as asset rankings change. \\
+
+\noindent \textbf{\emph{Step 3. Bayesian Update}} \\
+\indent The prior on expected returns is:
+\begin{equation}
+    \boldsymbol{\mu} \sim \mathcal{N}(\boldsymbol{\Pi}, \tau \boldsymbol{\Sigma})
+\end{equation}
+\indent This encodes the belief that expected returns are centred on the equilibrium 
+vector $\boldsymbol{\Pi}$, with uncertainty scaled by $\tau$. Combining this prior 
+with the view system via Bayes' theorem yields the posterior distribution over 
+expected returns:
+\begin{equation}
+    \boldsymbol{\mu} \mid \boldsymbol{Q} \sim \mathcal{N}(\boldsymbol{\mu_{BL}}, \boldsymbol{\Sigma_{BL}})
+\end{equation}
+where the posterior mean is:
+\begin{equation}
+    \boldsymbol{\mu_{BL}} = 
+    \left[(\tau \Sigma)^{-1} 
+    + P^{\top}\Omega^{-1}P\right]^{-1}\left[(\tau \Sigma)^{-1}\boldsymbol{\Pi} 
+    + P^{\top}\Omega^{-1}\boldsymbol{Q}\right]
+\end{equation}
+\indent The posterior mean $\boldsymbol{\mu}_{BL}$ is a precision-weighted average of the 
+equilibrium prior $\boldsymbol{\Pi}$ and the investor's views $\boldsymbol{Q}$, with each 
+source weighted inversely by its uncertainty. 
+When views are diffuse (large $\boldsymbol{\Omega}$), $\boldsymbol{\mu}_{BL}$ 
+remains close to $\boldsymbol{\Pi}$. 
+If the views are held with high confidence (small $\boldsymbol{\Omega}$), 
+$\boldsymbol{\mu}_{BL}$ tilts toward $\mathbf{Q}$. \newline
+
+This blending property is central to the appeal of the BL framework: 
+Rather than overriding the equilibrium prior, views are incorporated gradually 
+and in proportion to their confidence. This acts as a natural regulariser, because the 
+prior pulls weights toward the market portfolio, the model is far less prone to the 
+concentrated, unstable allocations that plague classical MVO. \\
+
+\noindent \textbf{\emph{Step 4. Portfolio Optimisation}} \\
+\indent The optimal portfolio is obtained by applying the same Sharpe-maximising 
+objective derived in Section~\ref{sec:mvo} (equation~\ref{eq:msr}), 
+substituting $\boldsymbol{\mu}_{\text{BL}}$ in place of the sample mean $\boldsymbol{\mu}$.
+
+\subsection{Risk Parity}
+
+\begin{keypoints*}
+\begin{itemize}
+  \item Risk Parity allocates capital such that every asset contributes                                       
+    equally to total portfolio volatility, not equally to capital.
+  \item Unlike MVO and Black-Litterman, Risk Parity requires no estimate
+    of expected returns: allocations depend only on the covariance structure.
+  \item The equal risk contribution condition $w_i(\boldsymbol{\Sigma}\mathbf{w})_i = c$
+    for all $i$ has no closed-form solution and in general and is solved numerically.
+\end{itemize}
+\end{keypoints*}
+
+\indent \indent The modern Risk Parity framework was popularised by Ray Dalio 
+at Bridgewater Associates and underpins the All Weather strategy introduced 
+in the 1990s. The approach was subsequently
+formalised by \citet{maillard_properties_2010}, who derived the mathematical
+conditions for equal risk contribution portfolios. \\
+\indent The central motivation
+departs entirely from the Mean Variance and Black-Litterman frameworks: rather than optimising
+expected return for a given level of risk, Risk Parity ignores return estimates
+altogether and instead focuses on how risk is distributed across the portfolio.
+
+\indent Risk Parity addresses a structural limitation shared by both MVO and
+the equal-weight portfolio:
+\begin{enumerate}
+  \vspace{-2mm}
+  \item In MVO and BL, allocations depend on estimated expected returns, which
+  are noisy and prone to estimation error.
+  \item In equal-weight portfolios, capital is diversified equally but risk is not.
+  Assets with high volatility dominate total portfolio risk despite receiving the
+  same capital allocation.
+  \vspace{-2mm}
+\end{enumerate}
+
+\noindent \textbf{\emph{Risk Decomposition}} \\
+\indent Portfolio volatility $\sigma_p = \sqrt{\mathbf{w}^\top \boldsymbol{\Sigma} \mathbf{w}}$
+is a homogeneous function of degree 1 in $\mathbf{w}$. By Euler's homogeneous
+function theorem, it admits the following decomposition:
+\begin{equation}
+  \sigma_p = \sum_{i=1}^{N} w_i \frac{\partial \sigma_p}{\partial w_i}
+\end{equation}
+The \emph{marginal risk contribution} (MRC) of asset $i$ is:
+\begin{equation}
+  \text{MRC}_i = \frac{\partial \sigma_p}{\partial w_i}
+  = \frac{(\boldsymbol{\Sigma}\mathbf{w})_i}{\sigma_p}
+\end{equation}
+and the total \emph{risk contribution} (RC) of asset $i$ is:
+\begin{equation}
+  \text{RC}_i = w_i \cdot \text{MRC}_i
+  = \frac{w_i\,(\boldsymbol{\Sigma}\mathbf{w})_i}{\sigma_p}
+\end{equation}
+with the useful property that $\sum_{i=1}^{N} \text{RC}_i = \sigma_p$. \\
+
+\noindent \textbf{\emph{The Risk Parity Condition}} \\
+\indent The portfolio is said to be \emph{risk-balanced} when every asset
+contributes equally to total portfolio volatility:
+\begin{equation}
+  \text{RC}_i = \frac{\sigma_p}{N} \quad \forall\, i
+\end{equation}
+Since $\sigma_p$ appears on both sides, this reduces to the equivalent condition:
+\begin{equation}
+  w_i\,(\boldsymbol{\Sigma}\mathbf{w})_i = c \quad \forall\, i
+  \label{eq:rp}
+\end{equation}
+for some constant $c > 0$, subject to $\mathbf{1}^\top \mathbf{w} = 1$ and $\mathbf{w} \geq \mathbf{0}$.
+This system has no closed-form solution in general and is solved numerically;
+the implementation details are described in Section~\ref{sec:methodology}. \\
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.45\textwidth]{../images/plots/theory/risk_parity_illustration.pdf}
+    \caption{Risk parity weights as a function of asset variance}
+    \label{fig:risk_parity_illustration}
+\end{figure}
+
+\noindent \textbf{\emph{Special Case: Uncorrelated Assets}} \\
+\indent When $\boldsymbol{\Sigma}$ is diagonal, the risk parity condition reduces to
+an analytic solution. Equal risk contribution then requires each asset's weight to be
+proportional to the inverse of its volatility:
+\begin{equation}
+  w_i^{\mathrm{RP}} = \frac{1/\sigma_i}{\displaystyle\sum_{j=1}^{N} 1/\sigma_j}
+\end{equation}
+\indent This inverse-volatility weighting is the closed-form limit of risk parity, and also
+serves as the natural initialisation point for the numerical solver in the general case.
+
+\indent Despite its appeal, Risk Parity has a well-known structural consequence:
+it mechanically overweights low-volatility assets. In a portfolio containing
+both equities and government bonds, bonds receive substantially larger
+capital allocations precisely because their volatility is lower, which raises
+the question of whether the resulting portfolio is truly diversified in an
+economic sense or merely in a statistical one.
+\section{Methodology}
+\label{sec:methodology}
+
+\subsection{Data}
+\label{sec:data}
+
+\indent \indent The dataset comprises daily adjusted closing prices for 18 assets
+over an 11-year period from 1 January 2015 to 31 December 2025, sourced
+programmatically from \citeauthor{yahoo_finance}. The universe is constructed to reflect a
+representative UK-centric multi-asset portfolio: 15 large-cap FTSE 100 equities
+spanning eight sectors, supplemented by three exchange-traded products providing
+exposure to UK government bonds, gold, and broad commodities. The full asset
+universe is listed in Table~\ref{tab:assets}.
+
+\begin{table}[h]
+\centering
+\caption{Asset universe}
+\begin{tabular}{l l l}
+\toprule
+\textbf{Asset Class} & \textbf{Name} & \textbf{Ticker} \\
+\midrule
+Banking         & HSBC                         & HSBA.L \\
+                & Lloyds Banking Group         & LLOY.L \\
+                & Barclays                     & BARC.L \\
+Oil \& Gas      & Shell                        & SHEL.L \\
+                & BP                           & BP.L   \\
+Consumer Goods  & Unilever                     & ULVR.L \\
+                & Tesco                        & TSCO.L \\
+                & Diageo                       & DGE.L  \\
+Pharmaceuticals & AstraZeneca                  & AZN.L  \\
+                & GSK                          & GSK.L  \\
+Mining          & Rio Tinto                    & RIO.L  \\
+                & Glencore                     & GLEN.L \\
+Utilities       & National Grid                & NG.L   \\
+Telecoms        & Vodafone                     & VOD.L  \\
+Industrials     & Rolls-Royce                  & RR.L   \\
+\midrule
+UK Govt Bonds   & iShares Core UK Gilts ETF    & IGLT.L \\
+Precious Metals & Invesco Physical Gold ETC    & SGLD.L \\
+Commodities     & WisdomTree Broad Commodities & WCOG.L \\
+\bottomrule
+\end{tabular}
+\label{tab:assets}
+\end{table}
+\indent Adjusted closing prices are used in preference to raw prices. Yahoo
+Finance's adjusted close corrects for corporate actions including stock splits,
+rights issues, and dividend distributions, ensuring that computed returns reflect
+the true total return experienced by an investor. Missing observations arising
+from non-synchronous trading calendars are handled by forward-filling the most
+recent available price prior to return calculation. \\
+
+\indent The risk-free rate is proxied by the 3-month UK Treasury Bill rate,
+sourced from the Federal Reserve Economic Data database and converted to
+a daily rate \citeauthor{FRED}. The rate is applied time-variably across the sample, capturing the
+material shift from near-zero rates during 2015--2021 to above 5\% during the
+2023-2024 tightening cycle.
+
+\begin{keypoints*}
+\begin{itemize}
+  \item The universe comprises 18 assets across diversified sectors, 
+  including equities, bonds, gold and commodities.
+  \item Monthly rebalancing on the final trading day of each calendar 
+  month is applied consistently across all four strategies.
+  \item The walk-forward design of the backtester enforces a strict information
+  barrier, ensuring no look-ahead bias.
+\end{itemize}
+\end{keypoints*}
+
+\subsection{Model Implementation}
+\label{sec:model-implementation}
+\indent \indent All models are implemented from first principles in Python using
+\texttt{NumPy} and \texttt{Pandas}, following an object-oriented design in which
+each strategy inherits from a common abstract base class. This ensures full
+transparency and reproducibility of all optimisation steps. The complete source
+code is publicly available at the project repository \citep{scr_repo}. \\
+\indent All models share a rolling estimation framework: at each monthly rebalancing
+date, covariance and return inputs are re-estimated using the preceding 252
+trading days of data. Table~\ref{tab:implementation} summarises the key
+implementation parameters for each strategy.
+
+\begin{table}[h]
+\centering
+\caption{Implementation parameters by strategy}
+\begin{tabular}{l l l l}
+\toprule
+\textbf{Model} & \textbf{Window} & \textbf{Constraints} & \textbf{Solver} \\
+\midrule
+Equal Weight    & None     & $w_i = 1/N$ & Closed-form    \\
+MVO             & 252 days & Long-only   & Active-set     \\
+Black-Litterman & 252 days & Long-only   & Active-set     \\
+Risk Parity     & 252 days & Long-only   & Newton-Raphson \\
+\bottomrule
+\end{tabular}
+\label{tab:implementation}
 \end{table}
 
-\subsection{Interpretation of Findings}
-Discuss what your results mean. How do they relate to your initial research question? Are they consistent with existing literature? What are the implications of your findings?
+\indent Equal Weight assigns $w_i = 1/N$ at each rebalancing date 
+and requires no parameter estimation. \\
 
-\section{Conclusion and Future Work}
+\indent In the Mean-Variance model, the maximum Sharpe ratio portfolio is solved 
+via an active-set method: assets with negative target weights are iteratively pruned from the
+investment set and the system is re-solved until all remaining weights satisfy
+the long-only constraint $w_i \geq 0$. A small ridge term $\lambda = 10^{-8}$
+is added to the diagonal of $\hat{\boldsymbol{\Sigma}}$ at each step to
+guarantee numerical positive definiteness. \\
 
-Summarize the main conclusions of your research. Reiterate the key insights and their importance.
+\indent Risk Parity solves the equal risk contribution system
+(equation~\ref{eq:rp}) via Newton-Raphson iteration, initialised with
+inverse-volatility weights. Convergence is typically achieved within 10
+iterations. \\
 
-Future work could include:
+\indent The Black-Litterman model requires two calibration parameters.
+The \textbf{prior uncertainty scalar} $\tau \in (0,1)$ controls how much uncertainty
+surrounds the equilibrium prior: a small $\tau$ implies strong confidence that expected
+returns are close to $\boldsymbol{\Pi}$, assigning little weight to the views. We set
+$\tau = 0.05$, consistent with the original implementation of
+\citet{he_intuition_2002}, who argued that uncertainty about the prior should be
+considerably smaller than uncertainty about the returns themselves. \newline 
+\indent The \textbf{risk-aversion coefficient} $\delta$ determines the magnitude of the
+equilibrium returns via $\boldsymbol{\Pi} = \delta \boldsymbol{\Sigma}
+\mathbf{w}_m$; a higher $\delta$ implies investors require greater compensation per unit
+of portfolio variance, producing larger implied equilibrium returns. We set $\delta = 3$,
+a standard value in the BL literature \citep{walters_black-litterman_2011}. A sensitivity
+analysis varying both parameters across a grid is reported in
+Section~\ref{sec:practical-implications}. \newline
+\indent The investor views incorporated are motivated by the momentum effect documented by
+\citet{jegadeesh_returns_1993}, showing that stocks with high returns over the prior 
+3-12 months continue to outperform stocks with low prior returns over the subsequent 
+3-12 months, generating abnormal returns of approximately 1\% per month. 
+This persistent pattern offers an empirically grounded basis for constructing views 
+within the BL framework. \newline 
+\indent A long-short view is then formed between the top and
+bottom terciles. The posterior expected returns $\boldsymbol{\mu}_{BL}$ are passed
+into the same active-set MVO solver used for the standard MVO strategy.
+
+\subsection{Backtesting Framework}
+\indent \indent The four strategies are evaluated using a walk-forward backtesting 
+engine to ensure zero look-ahead bias. The engine enforces a strict information 
+barrier by passing only prices up to the rebalancing date; the covariance dependent 
+strategies (MVO, BL, RP) then estimate over a 252 trading day sub-window. 
+This distinction is already implicit in Table~\ref{tab:implementation}
+(Section \ref{sec:model-implementation}). \\
+
+\begin{figure}[htbp]                                                                                          
+\centering
+\begin{tikzpicture}[node distance=1.5cm, scale=0.9, every node/.style={scale=0.9}]                            
+    \tikzstyle{block} = [rectangle, draw,
+        text width=3.5cm, text centered, rounded corners=4pt, minimum height=1cm,
+        line width=1pt, draw=jcolour]
+    \tikzstyle{arrow} = [thick,->,>=stealth,color=jcolour]
+
+    \node [block] (data) {Past Price Data\\(up to rebalance date)};
+    \node [block, below of=data] (strategy) {Strategy Computes\\Target Weights};
+    \node [block, below of=strategy] (rebalance) {Rebalance Portfolio};
+    \node [block, below of=rebalance] (track) {Track Portfolio Value};
+
+    \draw [arrow] (data) -- (strategy);
+    \draw [arrow] (strategy) -- (rebalance);
+    \draw [arrow] (rebalance) -- (track);
+    \draw [arrow] (track.east) -- ++(2,0) |-
+        node[near start, right, font=\footnotesize]
+    {\textcolor{black}{Next Month}} (data.east);
+\end{tikzpicture}
+\caption{Walk-forward backtesting loop}
+\label{fig:backtest_loop}
+\end{figure}
+
+\indent A starting capital of \pounds 100{,}000 is deployed on the first available 
+trading day. The portfolio is thereafter rebalanced on the final trading day of each
+calendar month, with all positions revalued daily at the adjusted closing price. \\
+
+\indent The simulation assumes perfect asset divisibility (i.e. the existence of fractional
+shares) and immediate execution at the closing price on each rebalancing date. Transaction
+costs are not modelled; portfolio turnover is instead reported as a standalone metric, allowing
+the reader to assess the practical trading burden of each strategy independently.
+\indent Bid-ask spreads and market impact are not accounted for; given that
+all 18 assets are large-cap and exchange-traded, it is reasonable to assume
+sufficient liquidity to absorb the portfolio's order flow without material
+execution slippage. \\
+
+\indent Each simulation run produces a \texttt{BacktestResult} object containing the daily 
+equity curve, full position history and a trade log. Performance metrics are computed 
+from the equity curve at the conclusion of each run and are defined in 
+Section~\ref{sec:performance-metrics}.
+
+\subsection{Performance Metrics}
+\label{sec:performance-metrics}
+
+\begin{keypoints*}
 \begin{itemize}
-    \item Exploring alternative methodologies or datasets.
-    \item Addressing limitations of the current study.
-    \item Expanding the research to a different market or asset class.
+  \item Sharpe and Sortino use annualised arithmetic mean return $\mu_p$, not CAGR, in the numerator.
+  \item Maximum drawdown measures the largest peak-to-trough loss in portfolio value over the sample.
+  \item Average monthly turnover quantifies rebalancing intensity and serves as a proxy for implementation cost.
 \end{itemize}
+\end{keypoints*}
+
+\indent \indent Nine metrics are used to evaluate each strategy, grouped
+into three categories: return, risk, and risk-adjusted. Let
+$r_t = V_t / V_{t-1} - 1$ denote the daily portfolio return,
+$V_0$ and $V_T$ the initial and terminal portfolio values, $T$ the total
+number of trading days, $\mu_p = \bar{r}_t \times 252$ the annualised
+arithmetic mean return, and $r_f$ the mean annualised risk-free rate over
+the sample. Table~\ref{tab:metrics} defines each metric formally. \\
+
+\indent Return metrics capture the magnitude of wealth creation. 
+CAGR annualises the compounded total return to allow comparison across 
+strategies regardless of sub-period variation. \newline 
+\indent Risk metrics characterise the severity and shape of losses: 
+maximum drawdown measures the worst peak-to-trough decline an investor 
+would have experienced; VaR and CVaR characterise tail losses from the 
+empirical return distribution without parametric assumptions. \newline 
+\indent Risk-adjusted metrics normalise excess return by some measure of 
+risk: the Sharpe ratio uses total volatility, while the Sortino ratio 
+penalises only downside deviations, making it more appropriate when
+return distributions are asymmetric.
+
+\begin{table}[h]
+\centering
+\caption{Performance metrics used to evaluate each strategy}
+\begin{tabular}{l l l}
+\toprule
+\textbf{Metric} & \textbf{Formula} & \textbf{Category} \\
+\midrule
+Total Return
+    & $V_T / V_0 - 1$
+    & Return \\
+CAGR
+    & $(V_T / V_0)^{252/T} - 1$
+    & Return \\
+Volatility
+    & $\hat{\sigma}(r_t) \cdot \sqrt{252}$
+    & Risk \\
+Max Drawdown
+    & $\displaystyle\min_t \left(\frac{V_t}{\max_{s \leq t} V_s} - 1\right)$
+    & Risk \\
+95\% VaR
+    & $\text{Percentile}(r_t,\; 5\%)$
+    & Risk \\
+95\% CVaR
+    & $\mathbb{E}[\,r_t \mid r_t \leq \text{VaR}\,]$
+    & Risk \\
+Sharpe Ratio
+    & $(\mu_p - r_f) \;/\; \hat{\sigma}_p$
+    & Risk-Adjusted \\
+Sortino Ratio
+    & $(\mu_p - r_f) \;/\; \hat{\sigma}_{\mathrm{down}}$
+    & Risk-Adjusted \\
+Avg.\ Monthly Turnover
+    & $\displaystyle\frac{1}{M}\sum_{m=1}^{M}\sum_{i=1}^{N}|w_{i,m} - w_{i,m-1}|$
+    & Portfolio \\
+\bottomrule
+\end{tabular}
+\label{tab:metrics}
+\end{table}
+
+\indent VaR and CVaR are computed from the empirical distribution of daily
+returns without a parametric assumption. $\hat{\sigma}_{\mathrm{down}}$
+denotes the annualised standard deviation of negative daily returns only,
+so the Sortino ratio penalises downside volatility exclusively. \newline
+\indent Average monthly turnover measures the mean total absolute weight change
+across all assets at each rebalancing date, providing a strategy-level
+indicator of trading activity.
+
+\section{Results}
+
+\begin{keypoints*}
+\begin{itemize}
+  \item Equal Weight achieves the highest total return (93.9\%) and Sharpe ratio (0.36) of all four strategies.
+  \item No strategy dominates uniformly: performance rankings shift materially across market regimes.
+  \item MVO generates the highest monthly turnover (34.7\%), over 13 times that of Equal Weight (2.5\%).
+\end{itemize}
+\end{keypoints*}
+
+\subsection{Full-Period Performance}
+
+\indent \indent Tables~\ref{tab:returns_risk} and \ref{tab:downside_risk} present the return, risk, and downside risk metrics for all four strategies 
+over the full sample period from 01/2015 to 12/2025, with Figure 3 showing the corresponding 
+cumulative wealth curves and Figure 4 the drawdown profiles. \\
+
+\begin{table}[h]
+\begin{center}
+\caption{Return and Risk Metrics (2015-2025)}
+\label{tab:returns_risk}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Metric} & \textbf{Equal Weight} & \textbf{Risk Parity} & \textbf{MVO} & \textbf{BL} \\
+\midrule
+Total Return  &  93.9\%  & 41.2\%  & 35.7\%  & 62.7\%  \\
+CAGR          &   6.2\%  &  3.2\%  &  2.8\%  &  4.5\%  \\
+Volatility    &  14.6\%  & 10\%  & 11.1\%  & 13.5\%  \\
+Sharpe Ratio  &    0.36  &    0.2  &    0.15  &    0.26  \\
+Max Drawdown  &  -30.6\% & -23.7\% & -23.7\% & -27.2\% \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{table}
+
+\vspace{-8mm}
+
+\begin{table}[h]
+\centering
+\caption{Downside Risk Metrics (2015-2025)}
+\label{tab:downside_risk}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Metric} & \textbf{Equal Weight} & \textbf{Risk Parity} & \textbf{MVO} & \textbf{BL} \\
+\midrule
+Sortino Ratio &  0.47   &  0.23   &  0.18   &  0.35   \\
+95\% VaR      & -1.4\% & -0.9\% & -1.1\% & -1.2\% \\
+95\% CVaR     & -2.2\% & -1.6\% & -1.7\% & -2.1\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\noindent \textbf{\emph{Raw returns}} \newline
+\indent Equal Weight delivered the strongest total return
+over the full period at 93.9\% (CAGR: 6.2\%), with its portfolio value reaching
+approximately \pounds194k by end-2025. Black-Litterman was the second-best strategy at
+62.7\% (CAGR: 4.5\%), followed by Risk Parity at 41.2\% and MVO at 35.7\%, the
+weakest in absolute terms. The three optimised strategies finished between \pounds136k and
+\pounds163k, well below the naive $1/N$ benchmark. \\
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.45\textwidth]{../images/plots/results/fig3_cumulative_wealth.pdf}
+    \caption{Cumulative wealth curves for all four strategies, indexed to \pounds100,000 initial capital}
+    \label{fig:cumulative_wealth}
+\end{figure}
+
+\noindent \textbf{\emph{Risk-adjusted performance}} \newline 
+\indent The ranking is preserved on a
+risk-adjusted basis. Equal Weight retains the top position with a Sharpe ratio of 0.36
+and Sortino of 0.47, reflecting that its higher volatility (14.55\%) was more than
+compensated by superior returns. Black-Litterman comes second (Sharpe: 0.26, Sortino:
+0.35), followed by Risk Parity (0.19\,/\,0.23) and MVO (0.15\,/\,0.18). \newline
+\indent Notably, all
+three optimised strategies underperformed the naive Equal Weight benchmark on a
+risk-adjusted basis: A well-documented result known as the \textbf{``1/N puzzle''}.
+In practice, estimation error in expected returns and covariances often causes optimised
+portfolios to underperform simpler allocations out-of-sample. \newline
+\indent The cumulative returns chart presents a broadly upward narrative, but the
+drawdown chart tells a more nuanced story about the cost of participating in that growth.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.45\textwidth]{../images/plots/results/fig4_drawdown.pdf}
+    \caption{Drawdown profiles}
+    \label{fig:drawdown}
+\end{figure}
+
+\noindent\textbf{\emph{Equal Weight's hidden fragility}} \\
+\indent Despite delivering the highest
+returns, Equal Weight also experienced the largest maximum drawdown at $-30.6\%$, most
+visibly during the COVID-19 market crash in early 2020. At that point, a \pounds100{,}000
+portfolio would have temporarily lost over \pounds30{,}000 of value, a risk that is
+easily missed in the upward trajectory of the cumulative chart. \\
+
+\noindent\textbf{\emph{Risk Parity's resilience under stress}} \\
+\indent Risk Parity and MVO
+share the smallest max drawdown ($-23.7\%$), and the drawdown chart in Figure~\ref{fig:drawdown} 
+shows Risk Parity recovered relatively quickly from most dips. Its comparatively low volatility (10\%)
+results in drawdowns that are both milder and shorter in duration, which is valuable for
+investors with lower loss tolerance or shorter time horizons. \\
+
+\noindent\textbf{\emph{Black-Litterman's 2022-2024 struggle}} \\
+\indent The drawdown chart
+highlights a sustained decline reaching $-27.2\%$ between 2022 and 2024. This risk
+episode is partially masked in the cumulative return plot due to the strong performance
+recorded in 2020-2022.
+
+%% ─────────────────────────────────────────────
+\subsection{Risk-Return Trade-off}
+\indent \indent Figures~\ref{fig:risk_return_scatter} and~\ref{fig:rolling_sharpe} examine
+where each strategy sits in risk-return space and how risk-adjusted performance evolved
+over time. \\
+
+\noindent\textbf{\emph{Risk-return positioning}} \\ 
+\indent \indent Equal Weight sits in the upper-right
+of the scatter, combining the highest return with the highest volatility (14.6\%). Despite
+this, it clears the 0.3 Sharpe isocurve, confirming it as the best risk-adjusted strategy
+of the four. \newline
+\indent Risk Parity occupies the opposite corner: the lowest volatility (10.0\%) but
+also the lowest return, placing it just above the 0.1 Sharpe isocurve. \newline
+\indent Black-Litterman
+sits at nearly the same volatility as Equal Weight (13.5\%) but with a return more than
+1.5 percentage points lower, offering poor compensation for the risk taken. \newline
+\indent MVO is the
+most difficult to justify: it achieves lower return than Risk Parity yet higher volatility,
+placing it in a dominated position in risk-return space. \\
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.45\textwidth]{../images/plots/results/fig5_risk_return_scatter.pdf}
+    \caption{Risk-return scatter, dashed lines are Sharpe ratio isocurves}
+    \label{fig:risk_return_scatter}
+\end{figure}
+
+\noindent\textbf{\emph{Performance consistency over time}} \\ 
+\indent \indent The rolling 12-month Sharpe
+ratio reveals that no strategy maintains a persistent advantage across the full sample.
+All four strategies move largely in tandem - rising together through the 2016-2019
+period, collapsing sharply in the COVID crash, recovering into 2021 and then compressing
+again through the 2022 rate-hiking cycle. \newline
+\indent This co-movement suggests that the macroeconomic
+regime is a stronger determinant of short-term risk-adjusted performance than the choice
+of allocation model. The implication is direct: model selection alone does not insulate a
+portfolio against systemic shocks, which motivates the episode-by-episode analysis in
+Section~\ref{sec:regime-dependence}.
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.45\textwidth]{../images/plots/results/fig6_rolling_sharpe.pdf}
+    \caption{Rolling 12-month Sharpe ratio}
+    \label{fig:rolling_sharpe}
+\end{figure}
+
+\subsection{Regime Dependence}
+\label{sec:regime-dependence}
+
+\begin{keypoints*}
+\begin{itemize}
+  \item BL excelled during the Brexit shock (+20.3\%); MVO was uniquely resilient during COVID (+3.6\%).
+  \item All strategies declined in 2022 as simultaneous equity and bond falls broke diversification logic.
+  \item Rolling Sharpe co-movement confirms macroeconomic regime dominates short-term model differences.
+\end{itemize}
+\end{keypoints*}
+
+\indent \indent Full-period metrics can mask very different behaviour across market conditions. 
+This section stress-tests the four strategies across three distinct episodes: the 
+Brexit shock (Jun-Dec 2016), the COVID-19 crash (Feb-Sep 2020) and the 2022 
+rate-hiking cycle (Jan-Dec 2022), each representing a different type of market 
+disruption. Table~\ref{tab:stress_periods} and Figure~\ref{fig:cumulative_wealth} 
+summarise cumulative returns across these periods.
+
+\begin{table}[h]
+\centering
+\caption{Strategy Return During Key Market Events}
+\label{tab:stress_periods}
+\begin{tabular}{lrrrr}
+\toprule
+\textbf{Event} & \textbf{Equal Weight} & \textbf{Risk Parity} & \textbf{MVO} & \textbf{BL} \\
+\midrule
+Brexit & 15.9\% & 6.2\% & 0.8\% & 20.3\% \\
+COVID & -25.8\% & -13.7\% & 3.6\% & -13.4\% \\
+Rate Hikes & 1.5\% & -4.3\% & -6\% & -10.9\%  \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\noindent\textbf{\emph{Brexit (Jun-Dec 2016)}} \newline
+\indent \indent The Brexit referendum triggered a sharp sterling depreciation and a rapid rotation 
+into exporters and internationally-exposed equities. Black-Litterman was the standout 
+performer, gaining 20.3\% over the period. Its view-adjusted allocations appear to 
+have captured the post-referendum equity rebound effectively. \newline 
+\indent Equal Weight followed at 15.9\%, benefiting from its broad exposure across assets without concentration 
+risk pulling it in the wrong direction. \newline 
+\indent Risk Parity lagged considerably at 6.2\%, 
+its defensive, risk-equalising stance limited upside participation during a strong 
+directional move. \newline 
+\indent MVO was essentially flat at 0.8\%, suggesting its concentrated 
+positioning was poorly aligned with the assets that benefited most from the shock.
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.45\textwidth]{../images/plots/results/fig7a_regime_brexit.pdf}
+    \caption{Regime: Brexit (Jun-Dec 2016)}
+    \label{fig:regime_brexit}
+\end{figure}
+
+\noindent\textbf{\emph{COVID-19 (Feb-Sep 2020)}} \\
+\indent \indent The COVID crash was sudden and indiscriminate, hitting all strategies hard in March 2020. 
+What made a real difference is how quick and complete their recovery was. \newline
+\indent MVO recovered fastest and was the only strategy to finish the period in positive
+territory (+3.6\%), its concentrated positioning in two safe-haven assets: gold and
+UK Gilts, proved well-suited to a crash driven by a flight to safety. \newline
+\indent Black-Litterman and Risk Parity ended the period in almost identical territory 
+($-13.4\%$ and $-13.7\%$ respectively), but went under different paths.
+Black-Litterman clawed its way back to breakeven by June 2020 before a second selloff 
+dragged it back down, while Risk Parity simply never recovered, staying underwater for 
+the entire period without any meaningful rebound. \newline
+\indent Equal Weight was the worst performer 
+by far, ending down $-25.8\%$. Its broad equity exposure amplified the drawdown, and 
+the chart shows it had not recovered anywhere near its starting level by October 2020.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.45\textwidth]{../images/plots/results/fig7b_regime_covid.pdf}
+    \caption{Regime: COVID-19 (Feb-Sep 2020)}
+    \label{fig:regime_covid}
+\end{figure}
+
+\noindent\textbf{\emph{Rate Hikes (Jan-Dec 2022)}} \\
+\indent \indent 2022 was uniquely damaging: equities and bonds sold off together, breaking a 
+well-established negative correlation between these assets. \newline
+\indent Equal Weight was the most resilient, ending the year roughly flat at $+1.5\%$. 
+Its lack of explicit bond exposure weighting meant it was less exposed to the bond 
+sell-off than the more sophisticated models. \newline 
+\indent Risk Parity ($-4.3\%$) held up better 
+than its structural weakness would suggest. While the equity-bond correlation 
+breakdown directly undermines its core diversification logic, losses were contained 
+to a level that outperformed both MVO and Black-Litterman. This suggests that the 
+risk spreading across other assets provided a cushion for the strategy. \newline
+\indent MVO ($-6\%$) fared 
+worse than Risk Parity despite having no structural sensitivity to bond markets. 
+Black-Litterman was the worst performer at $-10.9\%$, its view-adjusted allocations, 
+effective during Brexit, proved ill-suited to the speed and severity of the 2022 
+repricing.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.45\textwidth]{../images/plots/results/fig7c_regime_2022.pdf}
+    \caption{Regime: Rate Hikes (Jan-Dec 2022)}
+    \label{fig:regime_2022}
+\end{figure}
+
+\subsection{Portfolio Characteristics}
+
+\noindent\textbf{\emph{Allocation stability}} \\
+\indent \indent The three optimised strategies differ
+substantially in how they distribute and maintain their allocations over time. MVO is
+the most unstable: concentration rotates between a small number of assets, most
+notably IGLT.L and SGLD.L while the majority of the portfolio sits near zero for
+extended stretches. This "all or nothing" behaviour is characteristic of
+mean-variance optimisation, which tends to produce corner solutions that change
+dramatically from one rebalancing date to the next. \newline 
+\indent Black-Litterman is smoother,
+with weights more evenly distributed and less violent rotation, though IGLT.L
+consistently attracts a large allocation from 2018 onwards: a concentration risk
+that partially undermines the diversification the model is designed to provide. \newline
+\indent Risk Parity is the most stable: allocations are broadly uniform across assets for
+most of the period, consistent with its objective of equalising risk contribution
+rather than capital. The persistent overweight in IGLT.L reflects its low historical
+volatility (~6\%), which mechanically attracts a larger risk budget within the framework. \\
+
+\noindent\textbf{\emph{Turnover and the cost of complexity}} \\
+\indent \indent High turnover is not
+a sign of a well-functioning strategy, it is a cost. Figure~\ref{fig:turnover}
+shows MVO trading at an average monthly rate of 34.7\%, by far the highest of the
+four: more than twice Black-Litterman (12.7\%), nearly four times Risk Parity (9\%),
+and almost fourteen times Equal Weight (2.5\%). The chart also reveals that MVO's
+turnover is not constant but spikes sharply at certain rebalancing dates, particularly
+around regime shifts, reflecting its sensitivity to changes in the estimated return
+and covariance inputs. \newline 
+\indent Every rebalancing generates transaction costs like brokerage
+fees and bid-ask spreads that erode net returns. Given that MVO already delivers the
+weakest gross performance, its net returns after implementation costs would be weaker
+still. Equal Weight, by contrast, requires minimal intervention yet outperforms all
+three optimised strategies over the full period. This is perhaps the most pointed
+finding of the section: \textbf{complexity does not necessarily pay.}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.45\textwidth]{../images/plots/results/fig9_turnover.pdf}
+    \caption{Monthly portfolio turnover for all four strategies. 
+    Each data point is the total absolute weight change across all assets at that month's rebalancing date}
+    \label{fig:turnover}
+\end{figure}
+
+\begin{keypoints*}
+\begin{itemize}
+  \item MVO's average monthly turnover of 34.7\% is over 13 times that of Equal Weight (2.5\%).
+  \item Risk Parity maintains the most stable allocations (ignoring equal weight), consistent with its covariance-only objective.
+  \item Transaction costs not modelled here would disproportionately erode MVO's already weakest gross returns.
+\end{itemize}
+\end{keypoints*}
+
+\vspace{4em}
+\section{Discussion}
+\subsection{Why did 1/N perform well?}
+
+\indent \indent The headline finding of this study is that Equal Weight, a strategy
+requiring no parameter estimation and no optimisation, delivered the highest cumulative
+return, the highest Sharpe ratio and the highest Sortino ratio of all four strategies over
+the full 2015-2025 period. This is not a marginal result: it outperformed the next-best
+strategy (Black-Litterman) by over 31 percentage points in total return and by 0.1 Sharpe
+units. \newline
+\indent The natural question is: Why do three strategies that explicitly attempt to exploit
+information about returns and covariances consistently fail to improve on a naive
+benchmark? \\
+
+\noindent\textbf{\emph{Estimation error as the root cause}} \\
+\indent The core explanation is estimation error. Mean-variance optimisation and its
+derivatives require two sets of inputs: a vector of expected returns $\boldsymbol{\mu}$
+and a covariance matrix $\boldsymbol{\Sigma}$. With 18 assets, this amounts to 18 mean
+estimates and 171 distinct covariance entries (189 parameters in total) each estimated
+from a rolling window of approximately 252 daily observations. \newline
+\indent The statistical precision of
+these estimates is inherently limited: sample means estimated from one year of data carry
+enormous standard errors, and small perturbations in $\boldsymbol{\mu}$ translate into
+large changes in the optimiser's output. \citet{michaud_markowitz_1989} characterised this as the
+"error maximisation" problem: the optimiser treats estimation noise as genuine signal and
+concentrates heavily into the assets whose returns happened to look most attractive over
+the estimation window, regardless of whether that outperformance will persist. \newline
+\indent Equal Weight
+sidesteps this entirely by assuming no asset is expected to outperform any other:
+a prior that, on short rolling windows, turns out to be approximately correct. \\
+
+\noindent\textbf{\emph{An established empirical regularity}} \\
+\indent This finding is not unique to our dataset. \citet{demiguel_optimal_2009}
+conducted a systematic comparison of 14 portfolio optimisation strategies across seven
+empirical datasets and found that none significantly outperformed 1/N on a risk-adjusted
+basis out-of-sample. \newline 
+\indent They derived a theoretical condition under which MVO improves on EW:
+the estimation window must exceed $N(N+1)/2$ periods, which for 18 assets implies over
+170 years of data; far beyond any realistic investment horizon. Our results replicate
+their finding on a UK multi-asset universe with a ten-year sample period. The 1/N puzzle
+is therefore not a curiosity of our particular dataset, but a well-documented property of
+mean-variance optimisation in realistic finite-sample settings. \\
+
+\noindent\textbf{\emph{Why this universe is particularly amenable to EW}} \\
+\indent The composition of the 18-asset portfolio matters. Because the universe spans
+genuinely distinct risk classes: UK equities, government bonds, gold, and broad
+commodities, a naive equal-weight allocation achieves meaningful cross-asset
+diversification without requiring any return forecast. \newline
+\indent Had the universe consisted of
+18 highly correlated stocks within a single sector, the free lunch of naive diversification
+would be substantially smaller, and the marginal value of optimisation would be greater.
+\indent The multi-asset structure also means that EW's equity overweight relative to bonds
+happened to pay off during the prolonged equity bull market of 2016-2021, a period
+which accounts for the majority of the performance gap. \\
+
+\noindent\textbf{\emph{Implications for portfolio construction}} \\
+\indent These results should not be read as a rejection of portfolio optimisation theory.
+The Markowitz framework and its Bayesian extensions are theoretically coherent; the issue
+is that their practical implementation with short estimation windows and no regularisation
+produces unstable, concentrated portfolios that perform poorly out-of-sample. \newline
+\indent Black-Litterman was designed precisely to address this by anchoring expected 
+returns to a stable equilibrium prior and updating it only partially in the direction 
+of investor views, thereby reducing sensitivity to noisy historical return estimates. 
+BL's underperformance in this study reflects the specific calibration
+choices made, in particular the dominance of momentum views over the equilibrium prior,
+rather than a fundamental deficiency in the Bayesian approach.
+This point is developed further in Section~\ref{sec:practical-implications}.
+
+\subsection{The risk parity puzzle}
+\label{sec:rp-puzzle}
+
+\begin{keypoints*}
+\begin{itemize}
+  \item Risk Parity's structural overweight in low-volatility gilts drags returns during equity bull markets.
+  \item The 2022 rate-hiking cycle broke the equity-bond diversification logic that underpins the strategy.
+  \item Unlevered risk parity lacks the return compensation that leveraged institutional implementations achieve.
+\end{itemize}
+\end{keypoints*}
+
+\indent \indent Risk Parity recorded the lowest volatility (10\%), the joint-smallest
+maximum drawdown ($-23.7\%$), and the most stable allocation profile of any strategy in
+this study. By the conventional logic of risk-adjusted performance, a portfolio that
+controls downside more effectively should produce a competitive Sharpe ratio. \newline 
+\indent Instead,
+Risk Parity delivered the lowest Sharpe (0.19) and the lowest total return (41.2\%) of
+the three optimised strategies, a result that warrants explanation. \\
+
+\noindent\textbf{\emph{Structural bond overweight}} \\
+\indent The root cause lies in how risk parity assigns capital. Because the strategy
+equalises risk contributions rather than weights, assets with low historical volatility
+mechanically receive a disproportionately large allocation. IGLT.L, the UK gilts ETF,
+carries approximately one-third the volatility of the equity constituents (6\% versus
+18-25\%), and consequently attracts a far larger risk budget than any individual equity. \newline
+\indent Over the 2015-2025 period, UK government bonds delivered modest nominal returns, and the
+strategy was structurally underweight in the equities that drove the majority of cross-asset
+returns. \newline
+\indent This is not a calibration error or an implementation flaw but it is the defining
+consequence of risk parity on a multi-asset universe in which equities dominate risk-adjusted
+performance. The strategy achieves what it promises: equal risk contribution. The cost is a
+persistent drag on returns during equity bull markets. \\
+
+\noindent\textbf{\emph{Correlation breakdown in the 2022 regime}} \\
+\indent Risk parity's theoretical appeal rests on the historically low or negative
+correlation between equities and government bonds. When equities fall, bonds typically
+rally, providing ballast that stabilises the portfolio. \newline 
+\indent In 2022, that relationship broke
+sharply: aggressive central bank rate hikes drove both asset classes lower simultaneously,
+producing a joint drawdown that is particularly damaging to a strategy holding a large
+bond allocation. \newline 
+\indent Risk Parity returned $-4.3\%$ over the 2022 rate-hiking cycle, worse
+than Equal Weight ($+1.5\%$) despite carrying significantly less equity risk. The regime
+that risk parity was, in principle, best positioned to weather proved to be one of its
+worst episodes in the sample. \\
+
+\noindent\textbf{\emph{The missing ingredient: Leverage}} \\
+\indent Institutional implementations of risk parity, most notably Bridgewater's
+All Weather strategy, apply leverage to scale the low-volatility portfolio up to a
+target return level, compensating for the return drag from bond overweighting. \newline
+\indent In an unlevered setting, the lower return profile is not offset, and the strategy's
+risk-adjusted advantage over equities is structurally compressed. Our implementation
+is unlevered throughout, which is the appropriate choice for a like-for-like comparison
+with the other strategies, but it means Risk Parity is evaluated in a setting that
+partially disadvantages its intended design. \newline 
+\indent A leveraged version would likely produce a
+materially different risk-return profile, though at the cost of introducing leverage risk
+and financing costs beyond the scope of this study.
+
+\noindent\textbf{\emph{Qualification}} \\
+\indent These results should not be read as a dismissal of risk parity as a framework.
+Risk Parity provided the best downside protection during the COVID-19 crash ($-13.7\%$
+versus Equal Weight's $-25.8\%$) and consistently maintained lower peak-to-trough
+drawdowns across the full sample. For investors with lower loss tolerance, a shorter
+investment horizon, or a liability-matching objective, the drawdown characteristics may
+justify the return sacrifice. The puzzle, more precisely stated, is not that Risk Parity
+is a poor strategy in general, but that the specific conditions of 2015--2025 --- a
+prolonged equity bull market followed by a simultaneous bond and equity drawdown in
+2022 --- were precisely those least suited to an unlevered risk parity implementation
+on a UK multi-asset universe.
+
+\subsection{Practical Implications}
+\label{sec:practical-implications}
+
+\indent \indent The results of this study carry several practical lessons for
+portfolio construction beyond the model-specific findings discussed above. \\
+
+\noindent\textbf{\emph{Model selection depends on investor objective}} \\
+\indent No single strategy dominates across all dimensions of the performance space. A
+practitioner's choice should be conditioned on their investment objective:
+\begin{enumerate}
+    \item \textit{Total return / risk-adjusted performance}: Equal Weight. No strategy
+    in this study improved on it over the full sample.
+    \item \textit{Drawdown control / capital preservation}: Risk Parity. Its maximum
+    drawdown of $-23.7\%$ and rapid recovery from most dips suit investors with lower
+    loss tolerance or liability-matching objectives, provided they accept the structural
+    return drag from bond overweighting.
+    \item \textit{Systematic active tilts}: Black-Litterman, but only with carefully
+    constructed views and well-calibrated parameters. A mechanically implemented
+    momentum signal, as used here, does not reliably add value relative to the naive
+    benchmark on this universe.
+\end{enumerate}
+
+\noindent\textbf{\emph{Turnover as a hidden performance drag}} \\
+\indent Transaction costs are absent from the gross performance figures reported
+throughout this study, but they are not absent from reality. MVO's average monthly
+turnover of 34.7\% means that at every rebalancing, more than a third of the portfolio
+is being traded. Even modest transaction costs would reduce MVO's already weakest
+net returns further still, widening the gap with Equal Weight. \newline 
+\indent For a retail investor
+facing bid-ask spreads and brokerage fees that are multiples larger, MVO is effectively
+unimplementable without explicit cost controls such as turnover constraints or a minimum
+trade threshold. \newline 
+\indent By contrast, Equal Weight's 2.5\% average monthly turnover imposes a
+negligible implementation cost, reinforcing its practical appeal beyond its favourable
+gross performance. \\
+
+\noindent\textbf{\emph{BL parameter sensitivity: prior domination confirmed}} \\
+\indent To assess the robustness of the Black-Litterman results to calibration choices,
+we ran a grid search over $\tau \in \{0.01, 0.05, 0.10, 0.25\}$ and $\delta \in
+\{1, 2, 3, 5\}$, yielding 16 independent backtests. The results are shown in
+Figure~\ref{fig:bl_sensitivity}. The finding is striking: Returns and Sharpe ratio are
+\textbf{completely insensitive to $\tau$} across the full range tested, for any
+fixed $\delta$, returns vary less than 0.01 across all four values of $\tau$.
+This is direct empirical evidence of prior domination: the momentum views $Q$ are
+sufficiently large relative to the equilibrium prior $\boldsymbol{\Pi}$ that varying
+$\tau$, which controls how much weight the prior receives, has no measurable
+effect. \newline 
+\indent The posterior is determined almost entirely by the views, regardless of how
+uncertain the prior is declared to be. \newline
+\indent The risk-aversion coefficient $\delta$ has more impact: $\delta = 1$ produces a
+materially worse Sharpe (0.07) compared to $\delta \in \{2, 3, 5\}$, which all yield
+approximately 0.26. The degradation at $\delta = 1$ reflects how a lower risk-aversion
+coefficient produces smaller equilibrium returns ($\boldsymbol{\Pi} = \delta
+\boldsymbol{\Sigma}\mathbf{w}_m$), altering the posterior magnitude even when views
+dominate its direction. For $\delta \geq 2$, the model is robust to further increases
+in risk aversion. \newline
+\indent The practical implication is direct: in this implementation, BL behaves like MVO
+with momentum expected returns regardless of $\tau$. A practitioner wishing to
+genuinely exploit the Bayesian blending mechanism would need views smaller in magnitude
+relative to the equilibrium prior, or a substantially larger $\tau$ to reduce the
+prior's pull. Tuning $\tau$ within the conventional range offers no benefit here. \\
+
+\begin{keypoints*}
+\begin{itemize}
+  \item Black-Litterman returns and Sharpe ratio is entirely flat across $\tau \in \{0.01, 0.25\}$, confirming momentum views dominate the prior.
+  \item Performance is inversely ordered by complexity: more inputs consistently produced worse results.
+  \item Simplicity should be the rational default; complexity is justified only when input quality is high.
+\end{itemize}
+\end{keypoints*}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.45\textwidth]{../images/plots/results/fig_bl_sensitivity.pdf}
+    \caption{
+    Total return (\%) heatmap. \newline 
+    Black box marks the baseline configuration ($\tau = 0.05$, $\delta = 3$)
+    }
+    \label{fig:bl_sensitivity}
+\end{figure}
+
+\noindent\textbf{\emph{More information, worse performance}} \\
+\indent Perhaps the sharpest practical lesson of this study is that performance is
+inversely ordered by informational complexity. Equal Weight consumes no inputs beyond
+the asset universe itself. Risk Parity requires only the covariance matrix. MVO adds a
+vector of expected returns. Black-Litterman adds an equilibrium prior and investor views. \newline 
+\indent Yet the performance ranking runs in the opposite direction, with Equal Weight
+in first place. Each additional layer of input estimation
+introduces additional estimation error, and in a finite-sample setting that error
+compounds faster than any informational benefit accrues. \newline 
+\indent This does not mean complex
+models are without value, but it means their value is conditional on the quality of their
+inputs. Practitioners should treat simplicity as the rational default and reserve
+complexity for settings where reliable return forecasts are genuinely available.
+
+\subsection{Limitations}
+
+\begin{keypoints*}
+\begin{itemize}
+  \item Results are specific to 18 UK assets over 2015--2025 and may not generalise to other settings.
+  \item Performance is reported gross of transaction costs, which disproportionately disadvantages MVO.
+  \item The asset universe is subject to survivorship bias due to ex-post selection of FTSE 100 constituents.
+\end{itemize}
+\end{keypoints*}
+
+\indent \indent Several limitations of this study should be borne in mind when
+interpreting its findings. \\
+
+\noindent\textbf{\emph{Single universe and time period}} \\
+\indent All results are drawn from a single 18-asset UK multi-asset portfolio over
+2015-2025. This period is characterised by a prolonged equity bull market and a
+single rate-hiking episode: conditions that systematically favour Equal Weight's
+equity-heavy allocation and structurally disadvantage an unlevered Risk Parity
+strategy. \newline 
+\indent A different sample period or asset universe could produce materially
+different rankings. The finding that 1/N outperforms optimised strategies is
+consistent with the broader literature \citep{demiguel_optimal_2009}, but the
+magnitude of the gap is specific to this setting and should not be extrapolated. \\
+
+\noindent\textbf{\emph{No transaction costs}} \\
+\indent All performance metrics are reported gross of transaction costs. This
+overstates net performance for all strategies, but the distortion is highly
+uneven: MVO's average monthly turnover of 34.7\% means that transaction costs
+would erode its returns far more severely than Equal Weight's 2.5\%. \newline 
+\indent A realistic comparison would model costs explicitly. For example, as a fixed
+basis-point charge applied to each trade at every rebalancing date. The relative
+ordering of strategies could change once costs are accounted for, reinforcing
+the case against MVO even further. \\
+
+\noindent\textbf{\emph{Fixed estimation window}} \\
+\indent The 252-day rolling window used to estimate covariances and expected
+returns is a fixed design choice that is not optimised or validated. Shorter
+windows are more responsive to recent market conditions but introduce greater
+estimation noise; longer windows are more stable but slow to adapt to regime
+changes. \newline 
+\indent The sensitivity of results to window length is not explored here and
+represents a natural robustness check for future work. \\
+
+\noindent\textbf{\emph{Mechanical Black-Litterman views}} \\
+\indent The momentum signal used to construct BL views is a systematic,
+rules-based proxy rather than genuine investor views. The Black-Litterman
+framework was designed to incorporate analyst forecasts, macroeconomic
+judgments, and qualitative insights that a practitioner believes contain
+information beyond what the market has already priced in. \newline 
+\indent Using a mechanical momentum rule means BL is never operating as 
+originally intended: it is effectively MVO with a pre-specified return signal, 
+and its underperformance should be interpreted accordingly. \newline 
+\indent Results could differ substantially with views constructed from fundamentals, 
+macro factors or genuine active research. \\
+
+\noindent\textbf{\emph{Survivorship bias}} \\
+\indent The 18 assets were selected ex-post as known, continuously-traded
+constituents of the FTSE 100 over the sample period. \newline
+\indent Companies that were delisted, went bankrupt, or fell out of the index 
+during 2015-2025 are excluded by construction, which upward-biases the equity 
+returns in the universe and understates the true risk of holding UK large-cap 
+equities. \newline
+\indent A more rigorous analysis would construct the universe using point-in-time 
+index membership data.
+
+\section{Conclusion}
+
+\indent \indent This study implemented and compared four portfolio allocation strategies
+across an 18-asset UK multi-asset universe over 2015-2025: an equal-weight benchmark,
+Markowitz mean-variance optimisation, Black-Litterman and Risk Parity. The central
+question was whether model sophistication translates into superior out-of-sample
+performance. \\
+
+\noindent\textbf{\emph{On the three research questions}} \\
+\indent The first question, whether optimisation models outperform 1/N out-of-sample,
+is answered clearly in the negative. Equal Weight delivered the highest total return
+(93.9\%), the highest Sharpe ratio (0.36), and the highest Sortino ratio (0.47) of
+all four strategies, outperforming Black-Litterman by over 31 percentage points in
+cumulative return. \newline
+\indent In answer to the second question, no optimised strategy improved
+on Equal Weight on a risk-adjusted basis; the ranking by Sharpe is EW (0.36),
+BL (0.26), RP (0.19), MVO (0.15). Model complexity consistently hurt rather than
+helped. \newline 
+\indent In answer to the third question, regime analysis reveals that no strategy
+provides universal protection: BL excelled during the Brexit shock (+20.3\%), MVO was
+uniquely resilient during the COVID-19 crash (+3.6\%) due to its concentration in safe
+havens and Risk Parity, despite its theoretical all-weather appeal, was among the
+worst performers in the 2022 rate-hiking episode ($-4.3\%$) when the equity-bond
+correlation that underpins it broke down. \\
+
+\noindent\textbf{\emph{The central finding}} \\
+\indent The most striking pattern is that performance is inversely ordered by
+informational complexity: the strategy consuming the fewest inputs performed best,
+and each additional layer of estimation made things worse. \newline
+\indent This is not a failure of portfolio theory. It is a consequence of estimation 
+error in finite samples: optimisers amplify input noise into unstable, concentrated portfolios that underperform
+simpler alternatives out-of-sample. \newline 
+\indent Black-Litterman partially addresses this through
+its equilibrium prior, but in this implementation the prior is dominated by mechanical
+momentum views, reducing BL to MVO with a different signal. \newline 
+\indent Risk Parity avoids expected return estimation entirely and provides 
+meaningful downside protection, but its structural bond overweight drags 
+performance in equity-dominated environments. \\
+
+\noindent\textbf{\emph{Future work}} \\
+\indent Several natural extensions follow from the limitations of this study. \newline 
+\indent Modelling transaction costs explicitly would provide a more realistic comparison, 
+particularly for MVO. \newline 
+\indent Constructing the asset universe from point-in-time index membership data
+would eliminate survivorship bias. Replacing mechanical momentum views with
+fundamentals-based or macro-driven signals would allow BL to operate as intended. \newline
+\indent Applying leverage to Risk Parity would bring it closer to its institutional
+implementation. \newline 
+\indent Finally, extending the comparison to include Hierarchical Risk Parity
+and constrained MVO would complete the picture of how regularisation and structural
+constraints affect the estimation error problem.
 
 \section{Declarations}
 
-\subsection{Author Contributions}
-Briefly describe the contribution of each author to the research and writing of the report. For example: "A.B. designed the research. C.D. collected the data. E.F. performed the analysis. All authors contributed to writing the report."
+\noindent\textbf{Author Contributions} \\
+\indent R.d.S. led the project, coordinated all research activities, implemented the Risk Parity
+model and contributed to Sections 2 and 4. \\
+\indent J.H. built the backtesting engine, implemented the Black-Litterman model and wrote
+Section 3. \\
+\indent S.K. implemented the Equal Weight benchmark and the Mean-Variance Optimisation models
+and wrote Section 2. \\
+\indent F.C. implemented the MVO implementation with S.K. and wrote Section 5. \\
+\indent A.I. implemented Risk Parity with R.d.S and wrote Section 1. \\
+\indent All authors reviewed and approved the final manuscript. \\
 
-\subsection{Competing Interests}
-The authors declare that they have no competing interests.
+\noindent\textbf{Code Availability} \\
+\indent All code, backtesting infrastructure and figure generation scripts are
+publicly available at \citep{scr_repo}. \\
 
-\subsection{Funding}
-This research was conducted as part of the AP Capital Research initiative at the University of Surrey and received no external funding.
+\noindent\textbf{Acknowledgements} \\
+\indent The authors thank Surrey Capital Research for providing the institutional framework
+within which this research was conducted. \newline 
+\indent Special thanks to Diana Calheiros Cabecas and Piotr Ambrozewski for founding 
+the team and creating the research environment that made this work possible.
 
-\subsection{Acknowledgements}
-Thank anyone who provided help or support for the project, such as professors, mentors, or other colleagues.
+\newpage
 
-%% Specify your .bib file name here, without the extension
-\bibliography{../refs/apcr-refs}
+\bibliography{../refs/refs}
 
 \end{document}
+

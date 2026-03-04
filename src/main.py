@@ -13,7 +13,7 @@ from src.scripts.run_bl_backtest import run as run_bl
 DATA_PATH = "data/uk_multi_asset_prices_clean.csv"
 RFR_PATH = "data/risk_free_rate.csv"
 
-PCT_METRICS = {"total_return", "CAGR", "volatility", "max_drawdown", "95% VaR", "95% CVaR"}
+PCT_METRICS = {"total_return", "CAGR", "volatility", "max_drawdown", "95% VaR", "95% CVaR", "avg_monthly_turnover"}
 
 
 def load_data() -> tuple[pd.DataFrame, pd.Series]:
@@ -26,9 +26,9 @@ def main() -> None:
     prices, rfr = load_data()
 
     runs = {
-        "Equal Weight":    lambda: run_equal_weight(prices),
-        "Risk Parity":     lambda: run_risk_parity(prices),
-        "MVO":             lambda: run_mvo(prices, rfr),
+        "Equal Weight": lambda: run_equal_weight(prices, rfr),
+        "Risk Parity": lambda: run_risk_parity(prices, rfr),
+        "MVO": lambda: run_mvo(prices, rfr),
         "Black-Litterman": lambda: run_bl(prices, rfr),
     }
 

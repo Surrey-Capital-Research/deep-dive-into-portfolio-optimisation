@@ -5,7 +5,7 @@ from src.backtesting.strategies import RiskParityStrategy
 
 def run(prices: pd.DataFrame, rfr: pd.Series | None = None) -> BacktestResult:
     strategy = RiskParityStrategy(tickers=prices.columns.tolist(), cov_window=252)
-    return Backtester(prices=prices, strategy=strategy).run()
+    return Backtester(prices=prices, strategy=strategy, risk_free_rate=rfr if rfr is not None else 0.0).run()
 
 
 if __name__ == "__main__":

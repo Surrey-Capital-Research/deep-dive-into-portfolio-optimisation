@@ -9,7 +9,6 @@ poetry.lock
 # Plans
 planning/
 
-*.pdf
 # LaTeX auxiliary files
 *.aux
 *.bbl
@@ -20,8 +19,13 @@ planning/
 *.out
 *.synctex.gz
 *.toc
-*.snm
+*.vrb
 *.nav
+*.snm
+
+*.pdf
+!reports/images/scr-logo.pdf
+!reports/images/surrey-logo.pdf
 
 # AI slop
 CLAUDE.md

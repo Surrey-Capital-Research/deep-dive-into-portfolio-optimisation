@@ -16,7 +16,7 @@ def run(prices: pd.DataFrame, rfr: pd.Series | None = None) -> BacktestResult:
         view_builder=momentum_view_builder,
         optimiser=optimiser, # type: ignore
     )
-    return Backtester(prices=prices, strategy=strategy).run()
+    return Backtester(prices=prices, strategy=strategy, risk_free_rate=rfr if rfr is not None else 0.0).run()
 
 
 if __name__ == "__main__":

@@ -1,14 +1,13 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% apcr-contemporary.cls, v1, 10/12/2025
-% Developed by Overleaf, Edited by AP Capital Research
+% scr-contemporary.cls, v1, 10/12/2025
+% Developed by Overleaf, Edited by Surrey Capital Research
 % 
 % This class file enables authors to prepare 
-% manuscripts for submission to AP Capital Research using
+% manuscripts for submission to Surrey Capital Research using
 % the 'contemporary' layout.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-\ProvidesClass{apcr-contemporary}[10/12/2025, v1]
-
+\ProvidesClass{scr-contemporary}[10/12/2025, v1]
 \newif\if@numrefs
 \newif\if@alpharefs
 
@@ -32,10 +31,10 @@
 \RequirePackage[T1]{fontenc}
 \RequirePackage{ifpdf}
 \RequirePackage{microtype}
-\RequirePackage{euler}
+% \RequirePackage{euler}
 \RequirePackage{merriweather}
 \renewcommand{\ttdefault}{lmtt}
-\RequirePackage[italic]{mathastext}
+% \RequirePackage[italic]{mathastext}
 \RequirePackage{relsize}
 \RequirePackage{ragged2e}
 \RequirePackage{xcolor}
@@ -78,9 +77,9 @@
 \renewcommand\AB@authnote[1]{}
 \renewcommand\AB@affilnote[1]{}
 
-% APCR Specific Defaults
-\def\@jname{AP Capital Research}
-\def\@jlogo{apcr-logo.pdf}
+% SCR Specific Defaults
+\def\@jname{Surrey Capital Research}
+\def\@jlogo{scr-logo.pdf}
 \def\@secondlogo{} % Optional second logo
 
 \newcommand{\jname}[1]{\def\@jname{#1}}
@@ -102,7 +101,7 @@
 \def\@runningtitle{}
 \def\@corraddress{}
 \def\@authnotes{}
-\definecolor{jcolour}{RGB}{0,70,128} % Default APCR blue color (change RGB values for different color)
+\definecolor{jcolour}{RGB}{0,70,128} % Default SCR blue color (change RGB values for different color)
 
 \newcommand{\runningauthor}[1]{\def\@runningauthor{#1}}
 \newcommand{\runningtitle}[1]{\def\@runningtitle{#1}}
@@ -125,7 +124,7 @@
   \color{jcolour}%
   \textbf{\thepage}%
   \hspace{1em}\raisebox{-0.5pt}{|}\hspace{1em}%
-  \textit{\@jname}, \@jyear, Vol.~\@jvolume, No.~\@jnumber
+  \textit{\@papercat}, Vol.~\@jvolume
 }
 \fancyhead[RO]{%
   \fontsize{7.8pt}{10pt}\selectfont%
@@ -162,9 +161,9 @@
     {\color{black!15}\rule{\linewidth}{2pt}}\par%
     \vspace{\dimexpr 8pt-1em\relax}%
     \fontsize{6.5pt}{9.5pt}\bfseries%
-    \textcolor{jcolour}{doi: xx.xxxx/xxxx}\par
-    Manuscript in Preparation\par
-    \@papercat\par
+    \textcolor{jcolour}{Volume 1}\par
+    Final Manuscript\par
+    \@papercat \space Division \par
     \vspace{\dimexpr 8pt-1em\relax}%
     {\color{black!15}\rule{\linewidth}{2pt}}\par
   }}%
@@ -202,7 +201,7 @@
   \textblockorigin{4pc+6.64pt}{4pc+6pt}
   %%%%
   \begin{textblock*}{21pc}(0pt,0pt)
-  % APCR logo
+  % SCR logo
   \ifdefempty{\@jlogo}{}{%
   \IfFileExists{\@jlogo}{%
     \includegraphics[height=1.3\@gscitedetailsheight]{\@jlogo}
@@ -265,10 +264,12 @@
 \DeclareFloatingEnvironment[placement=t!,name=kpt]{keypoints}
 
 \xapptocmd{\keypoints}{%
-  \begin{mdframed}[linewidth=1pt,linecolor=black,
-  innerleftmargin=8pt,innerrightmargin=8pt,
-  innertopmargin=16pt-8.2pt,innerbottommargin=6pt]
-  {\fontsize{8.2pt}{10pt}\bfseries Key Points\par}
+  \begin{mdframed}[
+    linewidth=1pt, linecolor=black,
+    innerleftmargin=8pt, innerrightmargin=8pt,
+    innertopmargin=8pt, innerbottommargin=6pt,
+    ]
+  {\fontsize{8.2pt}{10pt}\bfseries Key Points\par\vspace{-6pt}}
 }{}{}
 \xpretocmd{\endkeypoints}{\end{mdframed}}{}{}
 
@@ -276,7 +277,7 @@
   \begin{mdframed}[linewidth=1pt,linecolor=black,
   innerleftmargin=8pt,innerrightmargin=8pt,
   innertopmargin=16pt-8.2pt,innerbottommargin=6pt]
-  {\fontsize{8.2pt}{10pt}\bfseries Key Points\par}
+  {\fontsize{8.2pt}{10pt}\bfseries Key Points\par\vspace{-6pt}}
 }{}{}
 \xpretocmd{\endkeypoints*}{\end{mdframed}}{}{}
 
@@ -292,8 +293,8 @@
       \fontsize{6.5pt}{9.5pt}\selectfont%
       \hrule%
       \vspace{\dimexpr 14pt-6.5pt\relax}%
-      \textbf{Compiled on:} \today.\par
-      Draft manuscript prepared by the author.\par
+      \textbf{Published on:} March 4, 2026\par
+      Journal prepared and edited by the authors\par
     \end{figure*}
   }
 \else
