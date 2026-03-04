@@ -124,7 +124,7 @@
   \color{jcolour}%
   \textbf{\thepage}%
   \hspace{1em}\raisebox{-0.5pt}{|}\hspace{1em}%
-  \textit{\@jname}, \@jyear, Vol.~\@jvolume, No.~\@jnumber
+  \textit{\@papercat}, Vol.~\@jvolume
 }
 \fancyhead[RO]{%
   \fontsize{7.8pt}{10pt}\selectfont%
@@ -161,9 +161,9 @@
     {\color{black!15}\rule{\linewidth}{2pt}}\par%
     \vspace{\dimexpr 8pt-1em\relax}%
     \fontsize{6.5pt}{9.5pt}\bfseries%
-    \textcolor{jcolour}{doi: xx.xxxx/xxxx}\par
-    Manuscript in Preparation\par
-    \@papercat\par
+    \textcolor{jcolour}{Volume 1}\par
+    Final Manuscript\par
+    \@papercat \space Division \par
     \vspace{\dimexpr 8pt-1em\relax}%
     {\color{black!15}\rule{\linewidth}{2pt}}\par
   }}%
@@ -264,10 +264,12 @@
 \DeclareFloatingEnvironment[placement=t!,name=kpt]{keypoints}
 
 \xapptocmd{\keypoints}{%
-  \begin{mdframed}[linewidth=1pt,linecolor=black,
-  innerleftmargin=8pt,innerrightmargin=8pt,
-  innertopmargin=16pt-8.2pt,innerbottommargin=6pt]
-  {\fontsize{8.2pt}{10pt}\bfseries Key Points\par}
+  \begin{mdframed}[
+    linewidth=1pt, linecolor=black,
+    innerleftmargin=8pt, innerrightmargin=8pt,
+    innertopmargin=8pt, innerbottommargin=6pt,
+    ]
+  {\fontsize{8.2pt}{10pt}\bfseries Key Points\par\vspace{-6pt}}
 }{}{}
 \xpretocmd{\endkeypoints}{\end{mdframed}}{}{}
 
@@ -275,7 +277,7 @@
   \begin{mdframed}[linewidth=1pt,linecolor=black,
   innerleftmargin=8pt,innerrightmargin=8pt,
   innertopmargin=16pt-8.2pt,innerbottommargin=6pt]
-  {\fontsize{8.2pt}{10pt}\bfseries Key Points\par}
+  {\fontsize{8.2pt}{10pt}\bfseries Key Points\par\vspace{-6pt}}
 }{}{}
 \xpretocmd{\endkeypoints*}{\end{mdframed}}{}{}
 
@@ -291,8 +293,8 @@
       \fontsize{6.5pt}{9.5pt}\selectfont%
       \hrule%
       \vspace{\dimexpr 14pt-6.5pt\relax}%
-      \textbf{Compiled on:} \today.\par
-      Draft manuscript prepared by the author.\par
+      \textbf{Published on:} March 4, 2026\par
+      Journal prepared and edited by the authors\par
     \end{figure*}
   }
 \else

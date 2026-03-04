@@ -188,12 +188,14 @@ class Backtester:
             annual_factor / n_days
         ) - 1.0
 
+        mean_return = float(rets.mean() * annual_factor)
+
         downside = rets[rets < 0]
         downside_vol = downside.std() * np.sqrt(252)
-        sortino = (cagr - risk_free_rate) / downside_vol if downside_vol > 0 else np.nan
+        sortino = (mean_return - risk_free_rate) / downside_vol if downside_vol > 0 else np.nan
 
         vol = rets.std() * np.sqrt(annual_factor)
-        sharpe = (cagr - risk_free_rate) / vol if vol > 0 else np.nan
+        sharpe = (mean_return - risk_free_rate) / vol if vol > 0 else np.nan
 
         running_max = equity_curve.cummax()
         drawdown = equity_curve / running_max - 1.0
@@ -214,5 +216,5 @@ class Backtester:
             "max_drawdown": float(max_dd),
             "95% VaR": float(var_95),
             "95% CVaR": float(cvar_95),
-            "avg_monthly_turnover": avg_monthly_turnover,
+            "avg_monthly_turnover": float(avg_monthly_turnover),
         }

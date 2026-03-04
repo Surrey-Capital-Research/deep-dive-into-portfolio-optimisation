@@ -23,6 +23,8 @@ planning/
 *.nav
 *.snm
 
+*.pdf
+
 # AI slop
 CLAUDE.md
 GEMINI.md

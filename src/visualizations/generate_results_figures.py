@@ -110,11 +110,25 @@ def fig_cumulative_wealth(results: dict[str, BacktestResult]) -> None:
     for name, res in results.items():
         ax.plot(res.equity_curve, color=COLOURS[name], lw=1.5, label=name)
 
+    # Regime shading
+    regime_style = [
+        ("2016-06-23", "2016-12-31", "Brexit",     "#3082DA"),
+        ("2020-02-19", "2020-09-30", "COVID-19",   "#3082DA"),
+        ("2022-01-01", "2022-12-31", "Rate Hikes", "#3082DA"),
+    ]
+    y_bot = ax.get_ylim()[0]
+    for start, end, label, colour in regime_style:
+        ax.axvspan(pd.Timestamp(start), pd.Timestamp(end),
+                   alpha=0.10, color=colour, zorder=0)
+        ax.text(pd.Timestamp(start), y_bot * 1.06, label,
+                fontsize=7, color=colour, va="top", ha="left",
+                fontstyle="italic")
+
     ax.yaxis.set_major_formatter(
         mticker.FuncFormatter(lambda v, _: f"£{v/1_000:.0f}k")
     )
     ax.set_ylabel("Portfolio Value", fontsize=10)
-    ax.legend(loc="upper left", frameon=False)
+    ax.legend(fontsize=7.5, loc="upper left", frameon=False)
     ax.grid(True, axis="y")
     fig.tight_layout()
     save(fig, "fig3_cumulative_wealth")
@@ -133,30 +147,42 @@ def fig_drawdown(results: dict[str, BacktestResult]) -> None:
     ax.yaxis.set_major_formatter(pct)
     ax.set_ylabel("Drawdown", fontsize=10)
     ax.set_ylim(top=0.01)
-    ax.legend(loc="lower left")
+    ax.legend(fontsize=7.5, loc="lower right", frameon=False)
     ax.grid(True, axis="y")
     fig.tight_layout()
     save(fig, "fig4_drawdown")
 
 
 # ── Figure 5: Risk-Return Scatter ─────────────────────────────────────────────
-def fig_risk_return(results: dict[str, BacktestResult]) -> None:
+def fig_risk_return(results: dict[str, BacktestResult], rfr: pd.Series) -> None:
     plt.rcParams.update(STYLE)
-    fig, ax = plt.subplots(figsize=(3.5, 3.5))
+    fig, ax = plt.subplots(figsize=(5.5, 4.0))
 
+    avg_rf = float(rfr.mean())
+
+    # Sharpe isocurves: μ_p = r_f + SR × σ  →  straight lines in (σ, μ_p) space
+    vol_range = np.linspace(0.06, 0.20, 300)
+    for sr in [0.1, 0.2, 0.3, 0.4]:
+        y = avg_rf + sr * vol_range
+        ax.plot(vol_range, y, color="#cccccc", lw=0.9, linestyle="--", zorder=1)
+        ax.text(vol_range[-1] + 0.001, y[-1], f"SR = {sr:.1f}",
+                fontsize=7, color="#aaaaaa", va="center")
+
+    # Strategy dots (use annualised arithmetic mean return for consistency with isocurves)
     for name, res in results.items():
-        vol  = res.metrics["volatility"]
-        cagr = res.metrics["CAGR"]
-        ax.scatter(vol, cagr, color=COLOURS[name], s=75, zorder=4, linewidths=0)
-        ax.annotate(name, (vol, cagr),
-                    textcoords="offset points", xytext=(7, 2),
+        rets     = res.equity_curve.pct_change().dropna()
+        mean_ret = float(rets.mean() * 252)
+        vol      = res.metrics["volatility"]
+        ax.scatter(vol, mean_ret, color=COLOURS[name], s=80, zorder=4, linewidths=0)
+        ax.annotate(name, (vol, mean_ret),
+                    textcoords="offset points", xytext=(6, 3),
                     fontsize=7.5, color=COLOURS[name])
 
     ax.xaxis.set_major_formatter(pct)
     ax.yaxis.set_major_formatter(pct)
     ax.set_xlabel("Annualised Volatility", fontsize=10)
-    ax.set_ylabel("CAGR", fontsize=10)
-    ax.grid(True)
+    ax.set_ylabel("Annualised Return", fontsize=10)
+    ax.grid(True, alpha=0.4)
     fig.tight_layout()
     save(fig, "fig5_risk_return_scatter")
 
@@ -172,7 +198,7 @@ def fig_rolling_sharpe(results: dict[str, BacktestResult]) -> None:
 
     ax.axhline(0, color="#555555", lw=0.8, linestyle="--")
     ax.set_ylabel("Rolling Sharpe (12-month)", fontsize=10)
-    ax.legend(loc="upper left")
+    ax.legend(fontsize=7.5, loc="lower right", frameon=False)
     ax.grid(True, axis="y")
     fig.tight_layout()
     save(fig, "fig6_rolling_sharpe")
@@ -199,14 +225,16 @@ def _regime_fig(results: dict[str, BacktestResult],
     ax.xaxis.set_major_formatter(mdates.DateFormatter("%b '%y"))
     ax.xaxis.set_major_locator(mdates.MonthLocator(interval=2))
     plt.setp(ax.xaxis.get_majorticklabels(), rotation=35, ha="right", fontsize=7)
-    ax.legend(fontsize=7.5, loc="lower left")
+    ax.legend(fontsize=7.5, loc="upper left", frameon=False)
+    if fname == "fig7c_regime_2022":
+        ax.legend(fontsize=7.5, loc="lower left", frameon=False)
     fig.tight_layout()
     save(fig, fname)
 
 
 def fig_regimes(results: dict[str, BacktestResult]) -> None:
     fnames = ["fig7a_regime_brexit", "fig7b_regime_covid", "fig7c_regime_2022"]
-    titles = ["Brexit (Jun–Dec 2016)", "COVID-19 (Feb–Sep 2020)", "Rate Hikes (Jan–Dec 2022)"]
+    titles = ["","",""]
     for fname, title, (_, (start, end)) in zip(fnames, titles, REGIMES.items()):
         _regime_fig(results, title, start, end, fname)
 
@@ -270,30 +298,21 @@ def fig_heatmaps(results: dict[str, BacktestResult], prices: pd.DataFrame) -> No
     save(fig, "fig8_allocation_heatmaps")
 
 
-# ── Figure 9: Turnover Bar Chart ──────────────────────────────────────────────
-def fig_turnover(results: dict[str, BacktestResult]) -> None:
+# ── Figure 9: Rolling Monthly Turnover ────────────────────────────────────────
+def fig_turnover(results: dict[str, BacktestResult], prices: pd.DataFrame) -> None:
     plt.rcParams.update(STYLE)
-    fig, ax = plt.subplots(figsize=(3.5, 3.2))
+    fig, ax = plt.subplots(figsize=(6.5, 3.5))
 
-    names     = list(COLOURS.keys())
-    turnovers = [results[n].metrics["avg_monthly_turnover"] for n in names]
-    colours   = [COLOURS[n] for n in names]
-
-    bars = ax.bar(names, turnovers, color=colours, width=0.55, linewidth=0, zorder=2)
-
-    for bar, val in zip(bars, turnovers):
-        ax.text(bar.get_x() + bar.get_width() / 2,
-                bar.get_height() + 0.003,
-                f"{val:.1%}", ha="center", va="bottom", fontsize=8.5)
+    for name, res in results.items():
+        weights  = compute_weights(res, prices)
+        monthly  = weights.resample("ME").last()
+        turnover = monthly.diff().abs().sum(axis=1).dropna()
+        ax.plot(turnover, color=COLOURS[name], lw=1.2, label=name, alpha=0.9)
 
     ax.yaxis.set_major_formatter(pct)
-    ax.set_ylabel("Avg Monthly Turnover", fontsize=10)
-    ax.set_xticks(range(len(names)))
-    ax.set_xticklabels(names, fontsize=8, rotation=15, ha="right")
-    ax.spines["bottom"].set_visible(False)
-    ax.tick_params(axis="x", length=0)
-    ax.grid(True, axis="y", zorder=0)
-
+    ax.set_ylabel("Monthly Turnover", fontsize=10)
+    ax.legend(fontsize=7.5, loc="upper left", frameon=False)
+    ax.grid(True, axis="y")
     fig.tight_layout()
     save(fig, "fig9_turnover")
 
@@ -309,10 +328,10 @@ def main() -> None:
     print("Generating figures...")
     fig_cumulative_wealth(results)
     fig_drawdown(results)
-    fig_risk_return(results)
+    fig_risk_return(results, rfr)
     fig_rolling_sharpe(results)
     fig_regimes(results)
-    fig_heatmaps(results, prices)
+    fig_turnover(results, prices)
     print("\nAll figures saved to", SAVE_DIR)
 
 

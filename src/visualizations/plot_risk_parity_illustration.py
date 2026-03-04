@@ -51,14 +51,12 @@ ax.yaxis.grid(True, zorder=0)
 ax.set_axisbelow(True)
 ax.xaxis.set_major_formatter(plt.FuncFormatter(lambda y, _: f"{y:.0f}%"))
 ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda y, _: f"{y:.0f}%"))
-ax.legend(fontsize=8.5, frameon=False)
 
 # ── Save ──────────────────────────────────────────────────────────────────────
 SAVE = "reports/images/plots/theory/risk_parity_illustration"
 os.makedirs(os.path.dirname(SAVE), exist_ok=True)
 
 fig.savefig(f"{SAVE}.pdf", bbox_inches="tight", dpi=150)
-fig.savefig(f"{SAVE}.png", bbox_inches="tight", dpi=150)
-print(f"Saved: {SAVE}.pdf / .png")
+print(f"Saved: {SAVE}.pdf")
 
 plt.close(fig)
